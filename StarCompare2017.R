@@ -11,7 +11,6 @@ collection_sets_2<-read.csv('~/documents/Consulting/Rootmetrics/rating_data/rati
 # 1-AT&T 2-Sprint 3-T-Mobile 4-Verizon
 carriers=c('AT&T','Sprint','T-Mobile','Verizon')
 
-
 locat_corr=data.frame()
 sort_ids=sort(collection_sets_2$collection_set_id)
 names=c()
@@ -190,6 +189,9 @@ callStarsRank_df_2 =dataStarsRank_df_2=speedStarsRank_df_2=smsStarsRank_df_2=sta
 row.names(callStarsRank_df_2)=row.names(dataStarsRank_df_2)=row.names(speedStarsRank_df_2)=row.names(smsStarsRank_df_2)=row.names(starsRank_overall_2)=locat_corr$id_2017_2
 #all rankings
 #datastars
+
+
+### Iterate over all locations and generate the ranking for each of the carriers
 tmpMat<-as.matrix(stars_overall_1)
 for(i in 1:nrow(tmpMat)){
   vals<-unique(tmpMat[i,],fromLast = TRUE)
@@ -337,56 +339,8 @@ for (i in 1:nrow(locat_corr)){
   }
 }
   
-
-#Save data
-setwd('documents/Consulting/Rootmetrics')
-write.csv(callStars_df_1,"Data/1H/call_star_raw_1H2017.csv")
-write.csv(dataStars_df_1,"Data/1H/data_star_raw_1H2017.csv")
-write.csv(smsStars_df_1,"Data/1H/sms_star_raw_1H2017.csv")
-write.csv(speedStars_df_1,"Data/1H/speed_star_raw_1H2017.csv")
-write.csv(callStars_df_2,"Data/2H/call_star_raw_2H2017.csv")
-write.csv(dataStars_df_2,"Data/2H/data_star_raw_2H2017.csv")
-write.csv(smsStars_df_2,"Data/2H/sms_star_raw_2H2017.csv")
-write.csv(speedStars_df_2,"Data/2H/speed_star_raw_2H2017.csv")
-
-write.csv(callStarsRank_df_1,"Data/1H/call_star_rank_1H2017.csv")
-write.csv(dataStarsRank_df_1,"Data/1H/data_star_rank_1H2017.csv")
-write.csv(smsStarsRank_df_1,"Data/1H/sms_star_rank_1H2017.csv")
-write.csv(speedStarsRank_df_1,"Data/1H/speed_star_rank_1H2017.csv")
-write.csv(callStarsRank_df_2,"Data/2H/call_star_rank_2H2017.csv")
-write.csv(dataStarsRank_df_2,"Data/2H/data_star_rank_2H2017.csv")
-write.csv(smsStarsRank_df_2,"Data/2H/sms_star_rank_2H2017.csv")
-write.csv(speedStarsRank_df_2,"Data/2H/speed_star_rank_2H2017.csv")
-
-
-write.csv(callScores_df_1,"Data/1H/call_score_raw_1H2017.csv")
-write.csv(dataScores_df_1,"Data/1H/data_score_raw_1H2017.csv")
-write.csv(smsScores_df_1,"Data/1H/sms_score_raw_1H2017.csv")
-write.csv(speedScores_df_1,"Data/1H/speed_score_raw_1H2017.csv")
-write.csv(callScores_df_2,"Data/2H/call_score_raw_2H2017.csv")
-write.csv(dataScores_df_2,"Data/2H/data_score_raw_2H2017.csv")
-write.csv(smsScores_df_2,"Data/2H/sms_score_raw_2H2017.csv")
-write.csv(speedScores_df_2,"Data/2H/speed_score_raw_2H2017.csv")
-
-write.csv(callScoresRank_df_1,"Data/1H/call_score_rank_1H2017.csv")
-write.csv(dataScoresRank_df_1,"Data/1H/data_score_rank_1H2017.csv")
-write.csv(smsScoresRank_df_1,"Data/1H/sms_score_rank_1H2017.csv")
-write.csv(speedScoresRank_df_1,"Data/1H/speed_score_rank_1H2017.csv")
-write.csv(callScoresRank_df_2,"Data/2H/call_score_rank_2H2017.csv")
-write.csv(dataScoresRank_df_2,"Data/2H/data_score_rank_2H2017.csv")
-write.csv(smsScoresRank_df_2,"Data/2H/sms_score_rank_2H2017.csv")
-write.csv(speedScoresRank_df_2,"Data/2H/speed_score_rank_2H2017.csv")
-
-# 
-# att.col<-c(0,159,219)
-# sprint.col<-c(251,223,0)
-# tmob.col<-c(227,0,116)
-# ver.col<-c(236,7,16)
-
 col_mat = matrix(c(0,159,219, 251,223,0, 227,0,116,236,7,16), # the data elements 
                  nrow=4,ncol=3, byrow = TRUE)
-
- 
  
 ########## Plot the RootStars Raw
 for(i in 1:length(carriers)){
@@ -585,7 +539,7 @@ for(i in 1:length(carriers)){
  
  
  
- ########## Plot the RootScores
+ ########## Plot the RootScores as histograms
  for(i in 1:length(carriers)){
    
    png(filename = paste("Plots/1H/speed_score_raw_",carriers[i],'_1H2017.png'))
@@ -636,7 +590,51 @@ for(carrier_id in 1:length(carriers)){
 colnames(call_hist)=colnames(speed_hist)=colnames(data_hist)=colnames(sms_hist)= seq(-5,5,.5)
 rownames(call_hist)=rownames(speed_hist)=rownames(data_hist)=rownames(sms_hist)=carriers
 
+#Save data
+setwd('documents/Consulting/Rootmetrics')
 
+## save the RootStar values from 1H to 2H of 2017
+write.csv(callStars_df_1,"Data/1H/call_star_raw_1H2017.csv")
+write.csv(dataStars_df_1,"Data/1H/data_star_raw_1H2017.csv")
+write.csv(smsStars_df_1,"Data/1H/sms_star_raw_1H2017.csv")
+write.csv(speedStars_df_1,"Data/1H/speed_star_raw_1H2017.csv")
+write.csv(callStars_df_2,"Data/2H/call_star_raw_2H2017.csv")
+write.csv(dataStars_df_2,"Data/2H/data_star_raw_2H2017.csv")
+write.csv(smsStars_df_2,"Data/2H/sms_star_raw_2H2017.csv")
+write.csv(speedStars_df_2,"Data/2H/speed_star_raw_2H2017.csv")
+
+## save the RootStar Rank values from 1H and 2H of 2017
+write.csv(callStarsRank_df_1,"Data/1H/call_star_rank_1H2017.csv")
+write.csv(dataStarsRank_df_1,"Data/1H/data_star_rank_1H2017.csv")
+write.csv(smsStarsRank_df_1,"Data/1H/sms_star_rank_1H2017.csv")
+write.csv(speedStarsRank_df_1,"Data/1H/speed_star_rank_1H2017.csv")
+write.csv(callStarsRank_df_2,"Data/2H/call_star_rank_2H2017.csv")
+write.csv(dataStarsRank_df_2,"Data/2H/data_star_rank_2H2017.csv")
+write.csv(smsStarsRank_df_2,"Data/2H/sms_star_rank_2H2017.csv")
+write.csv(speedStarsRank_df_2,"Data/2H/speed_star_rank_2H2017.csv")
+
+## save the RootScore values from 1H to 2H of 2017
+write.csv(callScores_df_1,"Data/1H/call_score_raw_1H2017.csv")
+write.csv(dataScores_df_1,"Data/1H/data_score_raw_1H2017.csv")
+write.csv(smsScores_df_1,"Data/1H/sms_score_raw_1H2017.csv")
+write.csv(speedScores_df_1,"Data/1H/speed_score_raw_1H2017.csv")
+write.csv(callScores_df_2,"Data/2H/call_score_raw_2H2017.csv")
+write.csv(dataScores_df_2,"Data/2H/data_score_raw_2H2017.csv")
+write.csv(smsScores_df_2,"Data/2H/sms_score_raw_2H2017.csv")
+write.csv(speedScores_df_2,"Data/2H/speed_score_raw_2H2017.csv")
+
+## save the RootScore Rank values from 1H to 2H of 2017
+write.csv(callScoresRank_df_1,"Data/1H/call_score_rank_1H2017.csv")
+write.csv(dataScoresRank_df_1,"Data/1H/data_score_rank_1H2017.csv")
+write.csv(smsScoresRank_df_1,"Data/1H/sms_score_rank_1H2017.csv")
+write.csv(speedScoresRank_df_1,"Data/1H/speed_score_rank_1H2017.csv")
+write.csv(callScoresRank_df_2,"Data/2H/call_score_rank_2H2017.csv")
+write.csv(dataScoresRank_df_2,"Data/2H/data_score_rank_2H2017.csv")
+write.csv(smsScoresRank_df_2,"Data/2H/sms_score_rank_2H2017.csv")
+write.csv(speedScoresRank_df_2,"Data/2H/speed_score_rank_2H2017.csv")
+
+
+### save the change from 1half to 2half of 2017 in each of the categories
 write.csv(callStars_df_2-callStars_df_1,"Data/Change/call_stars_raw_change2017.csv")
 write.csv(smsStars_df_2-smsStars_df_1,"Data/Change/sms_stars_raw_change2017.csv")
 write.csv(dataStars_df_2-dataStars_df_1,"Data/Change/data_stars_raw_change2017.csv")
