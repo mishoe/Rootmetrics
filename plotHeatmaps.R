@@ -1,4 +1,4 @@
-create_heatmaps<-function(folder_to_save='Plots/Change/Heatmaps/'){
+create_heatmaps<-function(carriers=c('AT&T','Sprint','T-Mobile','Verizon'),folder_to_save='Plots/Change/Heatmaps/'){
   ### Call Pull Data functions
   source('PullDataMethods.R')
   pull_data_2017_All(star=TRUE,score=TRUE)
@@ -8,7 +8,7 @@ create_heatmaps<-function(folder_to_save='Plots/Change/Heatmaps/'){
   library(plotly)
   
   # 1-AT&T 2-Sprint 3-T-Mobile 4-Verizon
-  carriers=c('AT&T','Sprint','T-Mobile','Verizon')
+  carriers=carriers
   categories = c('Call','Data','SMS','Speed')
   for (carrier_id in 2:(length(carriers)+1)){
     print(paste(c('Currently computing',carriers[(carrier_id-1)]),collapse=' '))
