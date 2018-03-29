@@ -1,12 +1,12 @@
-market_data_1<-read.csv("~/documents/Consulting/Rootmetrics/rating_data/rating_data/market_report_sets_ratings_1H2017.csv",header=T)
-test_data_1<-read.csv("~/documents/Consulting/Rootmetrics/test_summary_data/test_summary_ratings_1h2017.csv",header=T)
-rootscore_data_1<-read.csv('~/documents/Consulting/Rootmetrics/rating_data/rating_data/rootscore_ranks_1H2017.csv',header = T)
-collection_sets_1<-read.csv('~/documents/Consulting/Rootmetrics/rating_data/rating_data/collection_sets_1H2017.csv',header = T)
+market_data_1<-read.csv("rating_data/rating_data/market_report_sets_ratings_1H2017.csv",header=T)
+test_data_1<-read.csv("test_summary_data/test_summary_ratings_1h2017.csv",header=T)
+rootscore_data_1<-read.csv('rating_data/rating_data/rootscore_ranks_1H2017.csv',header = T)
+collection_sets_1<-read.csv('rating_data/rating_data/collection_sets_1H2017.csv',header = T)
 
-market_data_2<-read.csv("~/documents/Consulting/Rootmetrics/rating_data/rating_data/market_report_sets_ratings_2H2017.csv",header=T)
-test_data_2<-read.csv("~/documents/Consulting/Rootmetrics/test_summary_data/test_summary_ratings_2h2017.csv",header=T)
-rootscore_data_2<-read.csv('~/documents/Consulting/Rootmetrics/rating_data/rating_data/rootscore_ranks_2H2017.csv',header = T)
-collection_sets_2<-read.csv('~/documents/Consulting/Rootmetrics/rating_data/rating_data/collection_sets_2H2017.csv',header = T)
+market_data_2<-read.csv("rating_data/rating_data/market_report_sets_ratings_2H2017.csv",header=T)
+test_data_2<-read.csv("test_summary_data/test_summary_ratings_2h2017.csv",header=T)
+rootscore_data_2<-read.csv('rating_data/rating_data/rootscore_ranks_2H2017.csv',header = T)
+collection_sets_2<-read.csv('rating_data/rating_data/collection_sets_2H2017.csv',header = T)
 
 # 1-AT&T 2-Sprint 3-T-Mobile 4-Verizon
 carriers=c('AT&T','Sprint','T-Mobile','Verizon')
