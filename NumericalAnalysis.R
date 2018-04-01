@@ -5,6 +5,9 @@ pull_data_2017_All(star=TRUE,score=TRUE)
 #pull_data_2017_Compare(star=TRUE,score=TRUE)
 locat_corr = read.csv('Data/LocationLookup.csv')
 
+#### This first chunk of code looks at comparing the distributions of the change
+#### from 1H-2H of 2017 from score-score and score-star systems. 'Shock' factor
+#### which looks at deviance from the norm that going to the is new system would create
 
 call_rank_change_score_score = callScoresRank_df_2 - callScoresRank_df_1
 call_rank_change_score_star = callStarsRank_df_2 - callScoresRank_df_1
@@ -40,3 +43,5 @@ compare_system_var[1,4] = mean(as.matrix(speed_rank_change_score_score[2:5]))
 compare_system_var[2,4] = mean(as.matrix(speed_rank_change_score_star[2:5]))
 compare_system_var[3,4] = sd(as.matrix(speed_rank_change_score_score[2:5]))
 compare_system_var[4,4] = sd(as.matrix(speed_rank_change_score_star[2:5]))
+
+### End of comparing "Shock" factor measurement
