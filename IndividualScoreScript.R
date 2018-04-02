@@ -1,4 +1,25 @@
-generate_individ_scores<-function(carrier='Verizon',radius_miles = 30,targ_latlon = c(34.0007,-81.0348)){
+generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 29424",carrier='Verizon',radius_miles = 30){
+  library(plotly)
+  library(maps)
+  library(sp)
+  library(plotrix)
+  library(fiftystater)
+  library(mgcv)
+  api_key = "AIzaSyDxY76Lf1EjK1T3sY-ViCrt5qvtZE3Uwk0"
+  library(RJSONIO)
+  library(RCurl)
+  Sys.setenv('MAPBOX_TOKEN' = 'pk.eyJ1IjoiYWxsZW5yZW5jaDIyMiIsImEiOiJjamV4MTZ2anYxMnh2MndvNDQ4MDBzNjRkIn0.RD3zOxD_veDhoQG1wmHqiA')
+  
+  getGeoData <- function(location){
+    location <- gsub(' ','+',location)
+    geo_data <- getURL(paste("https://maps.googleapis.com/maps/api/geocode/json?address=",location,"&key=AIzaSyDxY76Lf1EjK1T3sY-ViCrt5qvtZE3Uwk0", sep=""))
+    raw_data_2 <- fromJSON(geo_data)
+    return(raw_data_2)
+  }
+  geo_data=getGeoData(targ_locat)
+  latlng = geo_data$results[[1]]$geometry$location
+  targ_latlon = c(as.numeric(latlng[1]),as.numeric(latlng[2]))
+  
   #install.packages('geosphere')
   test_dict<-read.csv('Data/individ_data_sc/aggregate_calculations.csv',header = T)
   test_data<-read.csv('Data/individ_data_sc/sc_test_locations.csv',header = T)
@@ -18,7 +39,8 @@ generate_individ_scores<-function(carrier='Verizon',radius_miles = 30,targ_latlo
   }
   
   test_subset=test_data[which((distVincentyEllipsoid(targ_mat, cbind(test_data$start_lat,test_data$start_lon), a=6378137, b=6356752.3142, f=1/298.257223563)/meters_per_mile)<radius_miles),]
-  
+  test_lats=test_subset$end_lat
+  test_lons=test_subset$end_lon
   ## call metrics
   co_block = length(which(as.character(test_subset$flag_access_success)=='f' & test_subset$test_type_id==16))  /   length(which(as.character(test_subset$flag_access_success)!='' & test_subset$test_type_id==16))
   co_drop = length(which(as.character(test_subset$co_flag_retain_success)=='f' & test_subset$test_type_id==16))  /   length(which(as.character(test_subset$co_flag_retain_success)!='' & test_subset$test_type_id==16))
@@ -85,9 +107,66 @@ generate_individ_scores<-function(carrier='Verizon',radius_miles = 30,targ_latlo
   speedStars=speedStars+ifelse(liteData95Quant<=1000,.5,0)
   
   speedStars=speedStars+ifelse(MM95Quant<=7000,.5,0)
+  print(targ_locat)
   print(paste(c('Using a',radius_miles,'mile radius of test data around the location,',carrier,'acheived the following scores:'),collapse=' '))
   print(paste(c('Call Stars:',callStars),collapse=' '))
   print(paste(c('Data Stars:',dataStars),collapse=' '))
   print(paste(c('Speed Stars:',speedStars),collapse=' '))
+  
+  
+  lat.cur<-targ_latlon[1]
+  long.cur<-targ_latlon[2]
+  rad.cur<-.1
+  
+  x.long<-NULL
+  for(i in 1:360){
+    x.long<-c(x.long,rad.cur*cos(i/360*2*pi)+long.cur)
+  }
+  x.long<-c(x.long,x.long[1])
+  
+  
+  y.lat<-NULL
+  for(i in 1:360){
+    y.lat<-c(y.lat,rad.cur*sin(i/360*2*pi)+lat.cur)
+  }
+  y.lat<-c(y.lat,y.lat[1])
+  
+  
+  rad.cur2<-.001
+  
+  x.long_pt<-NULL
+  for(i in 1:360){
+    x.long_pt<-c(x.long_pt,rad.cur2*cos(i/360*2*pi)+long.cur)
+  }
+  x.long_pt<-c(x.long_pt,x.long_pt[1])
+  
+  
+  y.lat_pt<-NULL
+  for(i in 1:360){
+    y.lat_pt<-c(y.lat_pt,rad.cur2*sin(i/360*2*pi)+lat.cur)
+  }
+  y.lat_pt<-c(y.lat_pt,y.lat_pt[1])
+  
+  
+  
+  dat <- map_data("state") %>% group_by(group)
+  sc.state<-which(dat[,5]=='south carolina')
+  test_lats=test_subset$end_lat
+  test_lons=test_subset$end_lon
+  p <- plot_mapbox(dat, x = ~long, y = ~lat) %>%
+    add_paths(size = I(2)) %>%
+    add_polygons(x=x.long,y=y.lat,color=I("#6cc93a"),opacity=.4)%>%
+    add_polygons(x=x.long_pt,y=y.lat_pt,color=I("#FF0000"),opacity=.4)%>%
+    layout(mapbox = list(zoom = 8,
+                         center = list(lat =targ_latlon[1] ,
+                                       lon = targ_latlon[2])
+                         
+                         
+    ))
+  
+  p
+  
+  
+  
 }
 
