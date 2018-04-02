@@ -34,10 +34,10 @@ ui <- fluidPage(
     ),
     
     # Show a plot of the generated distribution
-    mainPanel(
-      plotOutput("distPlot"),
-      plotOutput("distPlot1")
-    )
+    
+    mainPanel(column(width =  8,plotOutput("distPlot",height = '100%'),plotOutput("distPlot1")),
+              column(width=4,textOutput('mean1'),br(),textOutput('sd1'),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),textOutput('mean2'),br(),textOutput('sd2'))
+              )
   )
 )
 
@@ -68,6 +68,10 @@ server <- function(input, output) {
   
   ind.cur<-reactive({which(names_all[,1]==input$stars)})
   x    <- reactive({read.csv(names_all[ind.cur(),2])})
+  
+  
+  
+  
   #first plot
   output$distPlot <- renderPlot(height = 300,{
     # draw the histogram with the specified number of bins
@@ -138,7 +142,56 @@ server <- function(input, output) {
   
   
   
+  output$mean1<-renderText({
+    carr<-reactive({if(grepl('AT.T',input$carrier1)==T){2}
+      else if(grepl('Sprint',input$carrier1)==T){3}
+      else if(grepl('T.Mobile',input$carrier1)==T){4}
+      else if(grepl('Verizon',input$carrier1)==T){5}
+    })
+    
+    if(input$carrier1=='All'){paste('Mean All:',round(mean(unlist(filedata()[,2:5])),digits = 4))
+    }else(paste('Mean Carrier 1:',round(mean(filedata()[,carr()]),digits = 4)))
+    
+    })
   
+  output$mean2<-renderText({
+    carr<-reactive({if(grepl('AT.T',input$carrier2)==T){2}
+      else if(grepl('Sprint',input$carrier2)==T){3}
+      else if(grepl('T.Mobile',input$carrier2)==T){4}
+      else if(grepl('Verizon',input$carrier2)==T){5}
+
+    })
+    
+    if(input$carrier2=='All'){paste('Mean All:',round(mean(unlist(filedata()[,2:5])),digits = 4))
+    }else(paste('Mean Carrier 2:',round(mean(filedata()[,carr()]),digits = 4)))
+    
+  })
+  
+  
+  
+  output$sd1<-renderText({
+    carr<-reactive({if(grepl('AT.T',input$carrier1)==T){2}
+      else if(grepl('Sprint',input$carrier1)==T){3}
+      else if(grepl('T.Mobile',input$carrier1)==T){4}
+      else if(grepl('Verizon',input$carrier1)==T){5}
+    })
+    if(input$carrier1=='All'){paste('Sigma All:',round(sd(unlist(filedata()[,2:5])),digits = 4))
+    }else(paste('Sigma Carrier 1:',round(sd(filedata()[,carr()]),digits = 4)))
+
+    
+  })
+  
+  output$sd2<-renderText({
+    carr<-reactive({if(grepl('AT.T',input$carrier2)==T){2}
+      else if(grepl('Sprint',input$carrier2)==T){3}
+      else if(grepl('T.Mobile',input$carrier2)==T){4}
+      else if(grepl('Verizon',input$carrier2)==T){5}
+    })
+    
+    if(input$carrier2=='All'){
+      paste('Sigma All:',round(sd(unlist(filedata()[,2:5])),digits = 4))
+    }else(paste('Sigma Carrier 2:',round(sd(filedata()[,carr()]),digits = 4)))
+  })
   
   
   
