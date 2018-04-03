@@ -4,15 +4,40 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   library(sp)
   library(plotrix)
   library(fiftystater)
-  library(mgcv)
-  api_key = "AIzaSyDxY76Lf1EjK1T3sY-ViCrt5qvtZE3Uwk0"
+  library(mgcv)  
   library(RJSONIO)
   library(RCurl)
+  google_api_key = "AIzaSyDxY76Lf1EjK1T3sY-ViCrt5qvtZE3Uwk0"
   Sys.setenv('MAPBOX_TOKEN' = 'pk.eyJ1IjoiYWxsZW5yZW5jaDIyMiIsImEiOiJjamV4MTZ2anYxMnh2MndvNDQ4MDBzNjRkIn0.RD3zOxD_veDhoQG1wmHqiA')
   
+  targ_locat = "66 George St, Charleston, SC 29424"
+  carrier='Verizon'
+  radius_miles = 30
+  # this function accepts either single values or vectors as inputs for the lat and lon attributes.
+  # the return dataframe is in the form of what is required for the add_polygon function(plotter)
+  generate_poly_latlon <- function(lat,lon,radius,num_vertex){
+    angle = round(360/num_vertex)
+    return_df=NULL
+    for (iter in 1:length(lat)){
+      x.long<-NULL
+      y.lat<-NULL
+      for(i in seq(1,360,angle)){
+        x.long<-c(x.long,radius*cos(i/360*2*pi)+lon[iter])
+        y.lat<-c(y.lat,radius*sin(i/360*2*pi)+lat[iter])
+      }
+      x.long<-c(x.long,x.long[1])
+      y.lat<-c(y.lat,y.lat[1])
+      return_df=rbind(return_df,cbind(rep(iter,length(x.long)),x.long,y.lat))
+    }
+    return_df=data.frame(return_df)
+    colnames(return_df) = c("Group","Longitude","Latitude")
+    return(return_df)
+  }
+  
+  #this function takes an address(string) and geocodes it into a latitude,longitude pair
   getGeoData <- function(location){
     location <- gsub(' ','+',location)
-    geo_data <- getURL(paste("https://maps.googleapis.com/maps/api/geocode/json?address=",location,"&key=AIzaSyDxY76Lf1EjK1T3sY-ViCrt5qvtZE3Uwk0", sep=""))
+    geo_data <- getURL(paste("https://maps.googleapis.com/maps/api/geocode/json?address=",location,"&key=",google_api_key, sep=""))
     raw_data_2 <- fromJSON(geo_data)
     return(raw_data_2)
   }
@@ -37,10 +62,8 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   for (i in 1:(nrow(test_data))){
     targ_mat[i,] = targ_latlon
   }
-  
   test_subset=test_data[which((distVincentyEllipsoid(targ_mat, cbind(test_data$start_lat,test_data$start_lon), a=6378137, b=6356752.3142, f=1/298.257223563)/meters_per_mile)<radius_miles),]
-  test_lats=test_subset$end_lat
-  test_lons=test_subset$end_lon
+
   ## call metrics
   co_block = length(which(as.character(test_subset$flag_access_success)=='f' & test_subset$test_type_id==16))  /   length(which(as.character(test_subset$flag_access_success)!='' & test_subset$test_type_id==16))
   co_drop = length(which(as.character(test_subset$co_flag_retain_success)=='f' & test_subset$test_type_id==16))  /   length(which(as.character(test_subset$co_flag_retain_success)!='' & test_subset$test_type_id==16))
@@ -130,33 +153,21 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
     y.lat<-c(y.lat,rad.cur*sin(i/360*2*pi)+lat.cur)
   }
   y.lat<-c(y.lat,y.lat[1])
-  
-  
-  rad.cur2<-.001
-  
-  x.long_pt<-NULL
-  for(i in 1:360){
-    x.long_pt<-c(x.long_pt,rad.cur2*cos(i/360*2*pi)+long.cur)
-  }
-  x.long_pt<-c(x.long_pt,x.long_pt[1])
-  
-  
-  y.lat_pt<-NULL
-  for(i in 1:360){
-    y.lat_pt<-c(y.lat_pt,rad.cur2*sin(i/360*2*pi)+lat.cur)
-  }
-  y.lat_pt<-c(y.lat_pt,y.lat_pt[1])
-  
+
+  outer_circle_df = generate_poly_latlon(lat=targ_latlon[1],lon=targ_latlon[2],radius=.1,num_vertex = 360)
+  center_df = generate_poly_latlon(lat=targ_latlon[1],lon=targ_latlon[2],radius=.01,num_vertex = 360)
+  test_values_df = generate_poly_latlon(lat=unique(test_subset$end_lat),lon=unique(test_subset$end_lon),radius=.001,num_vertex = 3)
   
   
   dat <- map_data("state") %>% group_by(group)
   sc.state<-which(dat[,5]=='south carolina')
-  test_lats=test_subset$end_lat
-  test_lons=test_subset$end_lon
+  
   p <- plot_mapbox(dat, x = ~long, y = ~lat) %>%
     add_paths(size = I(2)) %>%
-    add_polygons(x=x.long,y=y.lat,color=I("#6cc93a"),opacity=.4)%>%
-    add_polygons(x=x.long_pt,y=y.lat_pt,color=I("#FF0000"),opacity=.4)%>%
+    add_polygons(x=outer_circle_df$Longitude,y=outer_circle_df$Latitude,color=I("#6cc93a"),opacity=.4)%>%
+    add_polygons(x=center_df$Longitude,y=center_df$Latitude,color=I("#FF0000"),opacity=.4)%>%
+    add_polygons(x=test_values_df$Longitude,y=test_values_df$Latitude,group_by(test_values_df,test_values_df$Group), color=I("#FF0000"),opacity=.4)%>%
+    #add_polygons(x=x.long_pt,y=y.lat_pt,color=I("#FF0000"),opacity=.4)%>%
     layout(mapbox = list(zoom = 8,
                          center = list(lat =targ_latlon[1] ,
                                        lon = targ_latlon[2])
