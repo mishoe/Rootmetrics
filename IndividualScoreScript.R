@@ -11,12 +11,8 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   google_api_key = "AIzaSyDxY76Lf1EjK1T3sY-ViCrt5qvtZE3Uwk0"
   Sys.setenv('MAPBOX_TOKEN' = 'pk.eyJ1IjoiYWxsZW5yZW5jaDIyMiIsImEiOiJjamV4MTZ2anYxMnh2MndvNDQ4MDBzNjRkIn0.RD3zOxD_veDhoQG1wmHqiA')
   pre_path = ifelse(in_app==TRUE, '../','')
+
   
-  
-  
-  targ_locat = "66 George St, Charleston, SC 29424"
-  carrier='Verizon'
-  radius_miles = 30
   # this function accepts either single values or vectors as inputs for the lat and lon attributes.
   # the return dataframe is in the form of what is required for the add_polygon function(plotter)
   generate_poly_latlon <- function(lat,lon,radius,num_vertex){
@@ -67,7 +63,7 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
     targ_mat[i,] = targ_latlon
   }
   test_subset=test_data[which((distVincentyEllipsoid(targ_mat, cbind(test_data$start_lat,test_data$start_lon), a=6378137, b=6356752.3142, f=1/298.257223563)/meters_per_mile)<radius_miles),]
-
+  degree_dist = sqrt(max((test_subset$start_lat-targ_latlon[1])^2+(test_subset$start_lon-targ_latlon[2])^2))
   ## call metrics
   co_block = length(which(as.character(test_subset$flag_access_success)=='f' & test_subset$test_type_id==16))  /   length(which(as.character(test_subset$flag_access_success)!='' & test_subset$test_type_id==16))
   co_drop = length(which(as.character(test_subset$co_flag_retain_success)=='f' & test_subset$test_type_id==16))  /   length(which(as.character(test_subset$co_flag_retain_success)!='' & test_subset$test_type_id==16))
@@ -155,18 +151,6 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   long.cur<-targ_latlon[2]
   rad.cur<-.1
   
-  x.long<-NULL
-  for(i in 1:360){
-    x.long<-c(x.long,rad.cur*cos(i/360*2*pi)+long.cur)
-  }
-  x.long<-c(x.long,x.long[1])
-  
-  
-  y.lat<-NULL
-  for(i in 1:360){
-    y.lat<-c(y.lat,rad.cur*sin(i/360*2*pi)+lat.cur)
-  }
-  y.lat<-c(y.lat,y.lat[1])
 
   outer_circle_df = generate_poly_latlon(lat=targ_latlon[1],lon=targ_latlon[2],radius=.1,num_vertex = 360)
   center_df = generate_poly_latlon(lat=targ_latlon[1],lon=targ_latlon[2],radius=.01,num_vertex = 360)
@@ -181,6 +165,7 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   m <- leaflet() %>%
     addTiles() %>%  # Add default OpenStreetMap map tiles
     addMarkers(lng=targ_latlon[2], lat=targ_latlon[1], popup=targ_locat)%>%
+    addCircles(lng=targ_latlon[2], lat=targ_latlon[1], popup=targ_locat,radius=radius_miles*meters_per_mile,color="#00ff00",fillOpacity=.1)%>%
     #addPolygons(lng=test_values_df$Longitude,lat=test_values_df$Latitude,data=group_by(test_values_df,Group), color=I("#FF0000"),opacity=.4)
     addCircles(lng=test_subset$end_lon, lat=test_subset$end_lat, weight = 3, radius=40, 
                color="#ff0000", stroke = TRUE, fillOpacity = 0.8)
