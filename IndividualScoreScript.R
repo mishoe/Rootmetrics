@@ -1,4 +1,4 @@
-generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 29424",carrier='Verizon',radius_miles = 30){
+generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 29424",carrier='Verizon',radius_miles = 30,in_app=FALSE){
   library(plotly)
   library(maps)
   library(sp)
@@ -9,6 +9,9 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   library(RCurl)
   google_api_key = "AIzaSyDxY76Lf1EjK1T3sY-ViCrt5qvtZE3Uwk0"
   Sys.setenv('MAPBOX_TOKEN' = 'pk.eyJ1IjoiYWxsZW5yZW5jaDIyMiIsImEiOiJjamV4MTZ2anYxMnh2MndvNDQ4MDBzNjRkIn0.RD3zOxD_veDhoQG1wmHqiA')
+  pre_path = ifelse(in_app==TRUE, '../','')
+  
+  
   
   targ_locat = "66 George St, Charleston, SC 29424"
   carrier='Verizon'
@@ -46,8 +49,8 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   targ_latlon = c(as.numeric(latlng[1]),as.numeric(latlng[2]))
   
   #install.packages('geosphere')
-  test_dict<-read.csv('Data/individ_data_sc/aggregate_calculations.csv',header = T)
-  test_data<-read.csv('Data/individ_data_sc/sc_test_locations.csv',header = T)
+  test_dict<-read.csv(paste(pre_path,'Data/individ_data_sc/aggregate_calculations.csv',sep=''),header = T)
+  test_data<-read.csv(paste(pre_path,'Data/individ_data_sc/sc_test_locations.csv',sep=''),header = T)
   library(geosphere)
   
   #Columbia SC lat,long
@@ -88,7 +91,7 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   MM95Quant=0#quantile(na.omit(test_data[which(test_data$test_type_id==23 & tmp_testDat_1$flag_access_success=='t'),]$m2mo_total_call_setup_duration),probs=c(.95))
   
   
-  callStars = dataStars = speedStars = smsStars = 0
+  callStars = dataStars = speedStars = smsStars = overallStars=0
   
   # assign call stars
   #mobile to landline call drop
@@ -135,7 +138,17 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   print(paste(c('Call Stars:',callStars),collapse=' '))
   print(paste(c('Data Stars:',dataStars),collapse=' '))
   print(paste(c('Speed Stars:',speedStars),collapse=' '))
+  print(paste(c('SMS Stars:',smsStars),collapse=' '))
+  print(paste(c('Overall Stars:',overallStars),collapse=' '))
   
+  output_list = c(targ_locat,
+             paste(c('Using a',radius_miles,'mile radius of test data around the location,',carrier,'acheived the following scores:'),collapse=' '),
+             paste(c('Call Stars:',callStars),collapse=' '),
+             paste(c('Data Stars:',dataStars),collapse=' '),
+             paste(c('Speed Stars:',speedStars),collapse=' '),
+             paste(c('SMS Stars:',smsStars),collapse=' '),
+             paste(c('Overall Stars:',overallStars),collapse=' '))
+
   
   lat.cur<-targ_latlon[1]
   long.cur<-targ_latlon[2]
