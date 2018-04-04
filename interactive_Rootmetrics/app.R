@@ -14,13 +14,16 @@ ui <- fluidPage(
   ),
   
   sidebarLayout(
-    sidebarPanel(tabsetPanel(
+    sidebarPanel(
+      tabsetPanel(
       
       tabPanel('Individual',
+               submitButton(text = "Apply Changes", icon = NULL, width = NULL),
                textInput("userloc","Input User Location:",'66 George Street, Charleston, SC'),
                selectInput('carrier','select which carrier',choices = c('AT&T','Sprint','T-Mobile','Verizon')),
                numericInput('milesrad','Input a Radius to check:',value=5,min=0,max=100)),
       tabPanel('Raw Distributions',
+               submitButton(text = "Apply Changes", icon = NULL, width = NULL),
                selectInput("carrier1",
                            "Select Carrier 1:",
                            choices = c('1 - AT.T','2 - Sprint','3 - T.Mobile','4 - Verizon','All')),
@@ -39,12 +42,13 @@ ui <- fluidPage(
                
       ),
       tabPanel('Comparisons',
+               submitButton(text = "Apply Changes", icon = NULL, width = NULL),
                selectInput("carrcomp1",
                            "Carrier 1 to Explore:",
                            choices = c('1 - AT.T','2 - Sprint','3 - T.Mobile','4 - Verizon')),
                selectInput("carrcomp2",
                            "Carrier 2 to Explore:",
-                           choices = c('1 - AT.T','2 - Sprint','3 - T.Mobile','4 - Verizon')),
+                           choices = c('4 - Verizon','3 - T.Mobile','2 - Sprint','1 - AT.T')),
                selectInput("data_type1",
                            "Select Data Type:",
                            choices = c('call','data','sms','speed')),
@@ -63,8 +67,8 @@ ui <- fluidPage(
       )
       
       
-    ),
-    submitButton(text = "Apply Changes", icon = NULL, width = NULL)
+    )
+    
     
     ),
     
@@ -77,10 +81,9 @@ ui <- fluidPage(
       ,tabPanel('Comparisons',align='center',textOutput('titlecomp'),
                 tags$head(tags$style("#titlecomp{color: black;
                                  font-size: 20px;
-                                     font-style: italic;
                                    text-align: center;
                                      }")),
-                br(),br(),br(),br(),plotOutput('comp11'),tableOutput('tablechanges'))
+                br(),br(),plotOutput('comp11'),tableOutput('tablechanges'),column(width=6,tableOutput('table1data')),column(width=6,tableOutput('table2data')))
     )
     
     )
@@ -394,11 +397,40 @@ server <- function(input, output) {
     tab.sd<-round(apply(as.matrix(filedata3()[,2:5]-filedata2()[,2:5]),2,sd),digits=3)
     table.change<-rbind(tab.mean,tab.sd)
 
-    table.change<-cbind(c('Mean','SD'),table.change)
+    table.change<-cbind(c('Mean of change','SD of change'),table.change)
     colnames(table.change)<-c(' ','AT&T','Sprint','T-Mobile','Verizon')
     table.change
     
     })
+  
+  
+  output$table1data<-renderTable({
+
+    
+    tab1.mean<-round(apply(as.matrix(filedata2()[,2:5]),2,mean),digits = 3)
+    tab1.sd<-round(apply(as.matrix(filedata2()[,2:5]),2,sd),digits=3)
+    table1data<-rbind(tab1.mean,tab1.sd)
+    
+    table1data<-cbind(c('Mean of 1st data set','SD 1st data set'),table1data)
+    colnames(table1data)<-c(' ','AT&T','Sprint','T-Mobile','Verizon')
+    table1data
+    
+  })
+  
+  
+  output$table2data<-renderTable({
+
+    
+    tab2.mean<-round(apply(as.matrix(filedata3()[,2:5]),2,mean),digits = 3)
+    tab2.sd<-round(apply(as.matrix(filedata3()[,2:5]),2,sd),digits=3)
+    table2data<-rbind(tab2.mean,tab2.sd)
+    
+    table2data<-cbind(c('Mean of 2nd data set','SD 2nd data set'),table2data)
+    colnames(table2data)<-c(' ','AT&T','Sprint','T-Mobile','Verizon')
+    table2data
+    
+  })
+  
   
   
   
