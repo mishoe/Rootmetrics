@@ -40,10 +40,10 @@ ui <- fluidPage(
       ),
       tabPanel('Comparisons',
                selectInput("carrcomp1",
-                           "Carrier 1 to Explore",
+                           "Carrier 1 to Explore:",
                            choices = c('1 - AT.T','2 - Sprint','3 - T.Mobile','4 - Verizon')),
                selectInput("carrcomp2",
-                           "Carrier 2 to Explore",
+                           "Carrier 2 to Explore:",
                            choices = c('1 - AT.T','2 - Sprint','3 - T.Mobile','4 - Verizon')),
                selectInput("data_type1",
                            "Select Data Type:",
@@ -58,7 +58,7 @@ ui <- fluidPage(
                            "Select time period 2:",
                            choices = c('2nd Half','1st Half')),
                selectInput("syscomp2",
-                           "select first system to see change to:",
+                           "select second system to see change to:",
                            choices = c('RootScore','RootStar'))
       )
       
@@ -74,13 +74,13 @@ ui <- fluidPage(
       tabPanel('individual Scores',leafletOutput('mapplot')),
       tabPanel('Raw Distributions', 
                column(width =  8,plotOutput("distPlot",height = '100%'),plotOutput("distPlot1")),column(width=4,textOutput('mean1'),br(),textOutput('sd1'),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),textOutput('mean2'),br(),textOutput('sd2')))
-      ,tabPanel('Comparisons',textOutput('titlecomp'),
+      ,tabPanel('Comparisons',align='center',textOutput('titlecomp'),
                 tags$head(tags$style("#titlecomp{color: black;
                                  font-size: 20px;
                                      font-style: italic;
                                    text-align: center;
                                      }")),
-                br(),br(),br(),br(),plotOutput('comp11'))
+                br(),br(),br(),br(),plotOutput('comp11'),tableOutput('tablechanges'))
     )
     
     )
@@ -331,7 +331,7 @@ server <- function(input, output) {
     
   })
   
-  #comparison plot 1
+  #comparison plot
   output$comp11 <- renderPlot(height = 300,{
 
     col.car1<-reactive({if(grepl('AT.T',input$carrcomp1)==T){rgb(0,159,219,maxColorValue = 255)}
@@ -377,6 +377,29 @@ server <- function(input, output) {
   output$mapplot<-renderLeaflet({
     generate_individ_scores(targ_locat =input$userloc,carrier=input$carrier,radius_miles = input$milesrad,in_app=T)
     })
+  
+  output$tablechanges<-renderTable({
+    carr1<-reactive({if(grepl('AT.T',input$carrcomp1)==T){2}
+      else if(grepl('Sprint',input$carrcomp1)==T){3}
+      else if(grepl('T.Mobile',input$carrcomp1)==T){4}
+      else if(grepl('Verizon',input$carrcomp1)==T){5}
+    })
+    carr2<-reactive({if(grepl('AT.T',input$carrcomp2)==T){2}
+      else if(grepl('Sprint',input$carrcomp2)==T){3}
+      else if(grepl('T.Mobile',input$carrcomp2)==T){4}
+      else if(grepl('Verizon',input$carrcomp2)==T){5}
+    })
+    
+    tab.mean<-round(apply(as.matrix(filedata3()[,2:5]-filedata2()[,2:5]),2,mean),digits = 3)
+    tab.sd<-round(apply(as.matrix(filedata3()[,2:5]-filedata2()[,2:5]),2,sd),digits=3)
+    table.change<-rbind(tab.mean,tab.sd)
+
+    table.change<-cbind(c('Mean','SD'),table.change)
+    colnames(table.change)<-c(' ','AT&T','Sprint','T-Mobile','Verizon')
+    table.change
+    
+    })
+  
   
   
   
