@@ -1,4 +1,4 @@
-generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 29424",carrier='Verizon',radius_miles = 30,in_app=FALSE){
+generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 29424",carrier='Verizon',radius_miles,in_app=FALSE){
   library(plotly)
   library(maps)
   library(sp)
@@ -62,8 +62,9 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   for (i in 1:(nrow(test_data))){
     targ_mat[i,] = targ_latlon
   }
-  test_subset=test_data[which((distVincentyEllipsoid(targ_mat, cbind(test_data$start_lat,test_data$start_lon), a=6378137, b=6356752.3142, f=1/298.257223563)/meters_per_mile)<radius_miles),]
-  degree_dist = sqrt(max((test_subset$start_lat-targ_latlon[1])^2+(test_subset$start_lon-targ_latlon[2])^2))
+  #test_subset=test_data[which((distVincentyEllipsoid(targ_mat, cbind(test_data$end_lat,test_data$end_lon), a=6378137, b=6356752.3142, f=1/298.257223563)/meters_per_mile)<radius_miles),]
+  test_subset=test_data[which((distm(c(targ_latlon[2],targ_latlon[1]), cbind(test_data$end_lon,test_data$end_lat), fun = distHaversine)/meters_per_mile)<radius_miles),]
+  #distm(c(lon1, lat1), c(lon2, lat2), fun = distHaversine)
   ## call metrics
   co_block = length(which(as.character(test_subset$flag_access_success)=='f' & test_subset$test_type_id==16))  /   length(which(as.character(test_subset$flag_access_success)!='' & test_subset$test_type_id==16))
   co_drop = length(which(as.character(test_subset$co_flag_retain_success)=='f' & test_subset$test_type_id==16))  /   length(which(as.character(test_subset$co_flag_retain_success)!='' & test_subset$test_type_id==16))
@@ -146,20 +147,8 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
              paste(c('SMS Stars:',smsStars),collapse=' '),
              paste(c('Overall Stars:',overallStars),collapse=' '))
 
-  
-  lat.cur<-targ_latlon[1]
-  long.cur<-targ_latlon[2]
-  rad.cur<-.1
-  
 
-  outer_circle_df = generate_poly_latlon(lat=targ_latlon[1],lon=targ_latlon[2],radius=.1,num_vertex = 360)
-  center_df = generate_poly_latlon(lat=targ_latlon[1],lon=targ_latlon[2],radius=.01,num_vertex = 360)
-  test_values_df = generate_poly_latlon(lat=unique(test_subset$end_lat),lon=unique(test_subset$end_lon),radius=.001,num_vertex = 3)
-  
-  
-  dat <- map_data("state") %>% group_by(group)
-  sc.state<-which(dat[,5]=='south carolina')
-  
+
   
   
   m <- leaflet() %>%
