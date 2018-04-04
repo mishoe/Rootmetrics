@@ -166,7 +166,7 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
     add_paths(size = I(2)) %>%
     add_polygons(x=outer_circle_df$Longitude,y=outer_circle_df$Latitude,color=I("#6cc93a"),opacity=.4)%>%
     add_polygons(x=center_df$Longitude,y=center_df$Latitude,color=I("#FF0000"),opacity=.4)%>%
-    add_polygons(x=test_values_df$Longitude,y=test_values_df$Latitude,group_by(test_values_df,test_values_df$Group), color=I("#FF0000"),opacity=.4)%>%
+    add_polygons(x=test_values_df$Longitude,y=test_values_df$Latitude,data=group_by(test_values_df,Group), color=I("#FF0000"),opacity=.4)%>%
     #add_polygons(x=x.long_pt,y=y.lat_pt,color=I("#FF0000"),opacity=.4)%>%
     layout(mapbox = list(zoom = 8,
                          center = list(lat =targ_latlon[1] ,
