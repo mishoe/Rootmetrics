@@ -2,7 +2,7 @@
 
 library(shiny)
 library(ggplot2)
-
+source('../IndividualScoreScript.R')
 
 
 
@@ -36,6 +36,11 @@ ui <- fluidPage(
                                           "select Comparison for carrier 1:",
                                           choices = c('RootScore 1h-2h','RootStar 1h-2h','Rootscore 1h - RootStar 2h','Rootscore 1h - RootStar 1h','Rootscore 2h - RootStar 2h'))
       )
+      ,
+      tabPanel('Individual',
+               textInput("userloc","Input User Location:",'Enter address...'),
+               selectInput('carrier','select which carrier',choices = c('AT&T','Sprint','T-Mobile','Verizon'))
+      )
     )
       
     ),
@@ -44,7 +49,7 @@ ui <- fluidPage(
     
     mainPanel(tabsetPanel(
       tabPanel('Raw Distributions', column(width =  8,plotOutput("distPlot",height = '100%'),plotOutput("distPlot1")),column(width=4,textOutput('mean1'),br(),textOutput('sd1'),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),textOutput('mean2'),br(),textOutput('sd2')))
-      ,tabPanel('Comparisons',plotOutput('comp11'))
+      ,tabPanel('Comparisons',leafletOutput('mapplot'))
       )
               
               )
@@ -361,7 +366,16 @@ server <- function(input, output) {
                                         
                                       }
   })
+  location.use<-reactive({input$userloc})
+  carrier.use<-reactive({input$carrier})
   
+  output$mapplot<-renderLeaflet({
+    p <- leaflet() %>%
+      addTiles()
+    p
+  #generate_individ_scores(targ_locat = location.use(),carrier=carrier.use(),radius_miles = 5,inapp=T)
+    })
+
   
 }
 
