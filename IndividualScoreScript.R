@@ -7,6 +7,7 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   library(mgcv)  
   library(RJSONIO)
   library(RCurl)
+  library(leaflet)
   google_api_key = "AIzaSyDxY76Lf1EjK1T3sY-ViCrt5qvtZE3Uwk0"
   Sys.setenv('MAPBOX_TOKEN' = 'pk.eyJ1IjoiYWxsZW5yZW5jaDIyMiIsImEiOiJjamV4MTZ2anYxMnh2MndvNDQ4MDBzNjRkIn0.RD3zOxD_veDhoQG1wmHqiA')
   pre_path = ifelse(in_app==TRUE, '../','')
@@ -175,20 +176,17 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   dat <- map_data("state") %>% group_by(group)
   sc.state<-which(dat[,5]=='south carolina')
   
-  p <- plot_mapbox(dat, x = ~long, y = ~lat) %>%
-    add_paths(size = I(2)) %>%
-    add_polygons(x=outer_circle_df$Longitude,y=outer_circle_df$Latitude,color=I("#6cc93a"),opacity=.4)%>%
-    add_polygons(x=center_df$Longitude,y=center_df$Latitude,color=I("#FF0000"),opacity=.4)%>%
-    add_polygons(x=test_values_df$Longitude,y=test_values_df$Latitude,data=group_by(test_values_df,Group), color=I("#FF0000"),opacity=.4)%>%
-    #add_polygons(x=x.long_pt,y=y.lat_pt,color=I("#FF0000"),opacity=.4)%>%
-    layout(mapbox = list(zoom = 8,
-                         center = list(lat =targ_latlon[1] ,
-                                       lon = targ_latlon[2])
-                         
-                         
-    ))
   
-  p
+  
+  m <- leaflet() %>%
+    addTiles() %>%  # Add default OpenStreetMap map tiles
+    addMarkers(lng=targ_latlon[2], lat=targ_latlon[1], popup=targ_locat)%>%
+    #addPolygons(lng=test_values_df$Longitude,lat=test_values_df$Latitude,data=group_by(test_values_df,Group), color=I("#FF0000"),opacity=.4)
+    addCircles(lng=test_subset$end_lon, lat=test_subset$end_lat, weight = 3, radius=40, 
+               color="#ff0000", stroke = TRUE, fillOpacity = 0.8)
+  m
+  
+  
   
   
   
