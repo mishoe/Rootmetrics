@@ -38,7 +38,7 @@ ui <- fluidPage(
       )
       ,
       tabPanel('Individual',
-               textInput("userloc","Input User Location:",'Enter address...'),
+               textInput("userloc","Input User Location:",'66 George Street, Charleston, SC'),
                selectInput('carrier','select which carrier',choices = c('AT&T','Sprint','T-Mobile','Verizon'))
       )
     )
@@ -49,7 +49,8 @@ ui <- fluidPage(
     
     mainPanel(tabsetPanel(
       tabPanel('Raw Distributions', column(width =  8,plotOutput("distPlot",height = '100%'),plotOutput("distPlot1")),column(width=4,textOutput('mean1'),br(),textOutput('sd1'),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),br(),textOutput('mean2'),br(),textOutput('sd2')))
-      ,tabPanel('Comparisons',leafletOutput('mapplot'))
+      ,tabPanel('Comparisons',leafletOutput('mapplot')),
+      submitButton(text = "Apply Changes", icon = NULL, width = NULL)
       )
               
               )
@@ -366,14 +367,14 @@ server <- function(input, output) {
                                         
                                       }
   })
-  location.use<-reactive({input$userloc})
+  location.use<-reactive({if(input$userloc=='Enter address...'){'66 George Street, Charleston, SC'}else(input$userloc) })
   carrier.use<-reactive({input$carrier})
+  plot.new<-reactive({  generate_individ_scores(targ_locat =input$userloc,carrier=input$carrier,radius_miles = 5,in_app=T)
+  })
   
   output$mapplot<-renderLeaflet({
-    p <- leaflet() %>%
-      addTiles()
-    p
-  #generate_individ_scores(targ_locat = location.use(),carrier=carrier.use(),radius_miles = 5,inapp=T)
+    plot.new()
+  #generate_individ_scores(targ_locat = location.use(),carrier=carrier.use(),radius_miles = 5,in_app=T)
     })
 
   
