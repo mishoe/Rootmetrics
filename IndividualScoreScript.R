@@ -54,17 +54,92 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   #targ_latlon = c(34.0007,-81.0348)
   meters_per_mile = 1609.34
   
-  test_data=test_data[which((distm(c(targ_latlon[2],targ_latlon[1]), cbind(test_data$end_lon,test_data$end_lat), fun = distHaversine)/meters_per_mile)<radius_miles),]
+  # 1-AT&T 2-Sprint 3-T-Mobile 4-Verizon
+  carriers=c('AT&T','Sprint','T-Mobile','Verizon')
+  carrier_id = which(carriers==carrier)
+  test_data = test_data[which(test_data$carrier_id==carrier_id),]
+  targ_mat = matrix(0,nrow=nrow(test_data),ncol=2)
+  for (i in 1:(nrow(test_data))){
+    targ_mat[i,] = targ_latlon
+  }
+  #test_subset=test_data[which((distVincentyEllipsoid(targ_mat, cbind(test_data$end_lat,test_data$end_lon), a=6378137, b=6356752.3142, f=1/298.257223563)/meters_per_mile)<radius_miles),]
+  test_subset=test_data[which((distm(c(targ_latlon[2],targ_latlon[1]), cbind(test_data$end_lon,test_data$end_lat), fun = distHaversine)/meters_per_mile)<radius_miles),]
+  #distm(c(lon1, lat1), c(lon2, lat2), fun = distHaversine)
+  ## call metrics
+  co_block = length(which(as.character(test_subset$flag_access_success)=='f' & test_subset$test_type_id==16))  /   length(which(as.character(test_subset$flag_access_success)!='' & test_subset$test_type_id==16))
+  co_drop = length(which(as.character(test_subset$co_flag_retain_success)=='f' & test_subset$test_type_id==16))  /   length(which(as.character(test_subset$co_flag_retain_success)!='' & test_subset$test_type_id==16))
+  m2mo_block = length(which(as.character(test_subset$flag_access_success)=='f' & test_subset$test_type_id==23))  /   length(which(as.character(test_subset$flag_access_success)!='' & test_subset$test_type_id==23))
   
-  star_df=calculate_star_values(test_data,carriers = carrier)
+  ## data metrics
+  ldrs_task_success = mean(na.omit(test_subset$percentage_task_success[which(test_subset$test_type_id==26)]))
+  dsd_task_success = mean(na.omit(test_subset$percentage_task_success[which(test_subset$test_type_id==20)]))
+  dsu_task_success = mean(na.omit(test_subset$percentage_task_success[which(test_subset$test_type_id==19)]))
+  percentDLThrough=sum(!is.na(test_data$dsd_effective_download_test_speed)&test_data$dsd_effective_download_test_speed>=1000)/sum(!is.na(test_data$dsd_effective_download_test_speed))
+  # % UL Through (dsu_effective_upload_test_speed >= 500)/count(dsu_effective_upload_test_speed) -- where dsdu_effective_upload_test_speed not NULL
+  percentULThrough=sum(!is.na(test_data$dsu_effective_upload_test_speed)&test_data$dsu_effective_upload_test_speed>=500)/sum(!is.na(test_data$dsd_effective_download_test_speed))
+  #UDP Packet Drop Rate mean(udp_packet_drop_rate) -- where test_type_id = 25
+  UDP_dat_mean=0#####mean(na.omit(test_data[which(test_data$test_type_id==25),]$udp_avg_packet_drop))
+  
+  #speed metrics
+  dsd_effective_throughput_05p = as.numeric(quantile(na.omit(test_subset$dsd_effective_download_test_speed[which(test_subset$test_type_id==20)]),.05))
+  dsd_time_to_first_byte_50p=as.numeric(quantile(na.omit(test_subset$dsd_time_to_first_byte_median[which(test_subset$test_type_id==20)]),.5))
+  dsd_effective_throughput_95p =as.numeric(quantile(na.omit(test_subset$dsd_effective_download_test_speed[which(test_subset$test_type_id==20)]),.95))
+  dsu_effective_throughput_05p=as.numeric(quantile(na.omit(test_subset$dsu_effective_upload_test_speed[which(test_subset$test_type_id==19)]),.05))
+  liteData95Quant=0#quantile(na.omit(test_subset[which(test_subset$test_type_id==26),]$ldrs_task_speed_max),probs=c(.95))
+  MM95Quant=0#quantile(na.omit(test_data[which(test_data$test_type_id==23 & tmp_testDat_1$flag_access_success=='t'),]$m2mo_total_call_setup_duration),probs=c(.95))
+  
+  
+  callStars = dataStars = speedStars = smsStars = overallStars=0
+  
+  # assign call stars
+  #mobile to landline call drop
+  callStars=callStars+ifelse(co_drop<=.01,2.5,ifelse(co_drop<=.015,2,ifelse(co_drop<=.02,1.5,ifelse(co_drop<=.025,1,ifelse(co_drop<=.03,.5,0)))))
+  #mobile to landline call block
+  callStars=callStars+ifelse(co_block<=.002,1.5,ifelse(co_block<=.005,1,ifelse(co_block<=.01,.5,0)))
+  #mobile to landline call block
+  callStars=callStars+ifelse(m2mo_block<=.015,1,ifelse(m2mo_block<=.02,.5,0))
+  
+  
+  #assign data stars
+  #Lite Data Secure
+  dataStars=dataStars+ifelse(ldrs_task_success>=.99,.5,0)
+  # Download Task Success
+  dataStars=dataStars+ifelse(dsd_task_success>=.99,.5,0)
+  # % DL Throughput
+  dataStars=dataStars+ifelse(percentDLThrough>=.97,2,ifelse(percentDLThrough>=.95,1.5,ifelse(percentDLThrough>=.92,1,ifelse(percentDLThrough>=.9,.5,0))))
+  # Upload Task
+  dataStars=dataStars+ifelse(dsd_task_success>=.99,.5,0)
+  # 
+  dataStars=dataStars+ifelse(percentULThrough>=.97,1,ifelse(percentULThrough>=.92,.5,0))
+  #Currently missing this data......
+  dataStars=dataStars+ifelse(UDP_dat_mean<=.05,.5,0)
+  
+  
+  
+  
+  #assign speed stars
+  #Calculate Speed and Performance stars for each of the regions
+  speedStars=speedStars+ifelse(dsd_effective_throughput_05p>=5000,1.5,ifelse(dsd_effective_throughput_05p>=3000,1,ifelse(dsd_effective_throughput_05p>=2000,0.5,0)))
+  
+  speedStars=speedStars+ifelse(dsd_time_to_first_byte_50p<=400,1,ifelse(dsd_time_to_first_byte_50p<=700,0.5,0))
+  
+  speedStars=speedStars+ifelse(dsd_effective_throughput_95p>=75000,.5,0)
+  
+  speedStars=speedStars+ifelse(dsu_effective_throughput_05p>=1500,1,ifelse(dsu_effective_throughput_05p>=1000,0.5,0)) 
+  
+  #need this val
+  speedStars=speedStars+ifelse(liteData95Quant<=1000,.5,0)
+  
+  speedStars=speedStars+ifelse(MM95Quant<=7000,.5,0)
+
   
   output_list = c(targ_locat,
              paste(c('Using a',radius_miles,'mile radius of test data around the location,',carrier,'acheived the following scores:'),collapse=' '),
-             paste(c('Call Stars:',star_df$call),collapse=' '),
-             paste(c('Data Stars:',star_df$data),collapse=' '),
-             paste(c('Speed Stars:',star_df$speed),collapse=' '),
-             paste(c('SMS Stars:',star_df$sms),collapse=' '),
-             paste(c('Overall Stars:',star_df$overall),collapse=' '))
+             paste(c('Call Stars:',callStars),collapse=' '),
+             paste(c('Data Stars:',dataStars),collapse=' '),
+             paste(c('Speed Stars:',speedStars),collapse=' '),
+             paste(c('SMS Stars:',smsStars),collapse=' '),
+             paste(c('Overall Stars:',overallStars),collapse=' '))
 
   
   
@@ -72,105 +147,20 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
     addTiles() %>%  # Add default OpenStreetMap map tiles
     addMarkers(lng=targ_latlon[2], lat=targ_latlon[1], popup=paste(targ_locat,"<br>",
                                                                paste(c('Using a',radius_miles,'mile radius of test data around the location,',carrier,'acheived the following scores:'),collapse=' '),"<br>",
-                                                               paste(c('Call Stars:',star_df$call),collapse=' '),"<br>",
-                                                               paste(c('Data Stars:',star_df$data),collapse=' '),"<br>",
-                                                               paste(c('Speed Stars:',star_df$speed),collapse=' '),"<br>",
-                                                               paste(c('SMS Stars:',star_df$sms),collapse=' '),"<br>",
-                                                               paste(c('Overall Stars:',star_df$overall),collapse=' ')))%>%
+                                                               paste(c('Call Stars:',callStars),collapse=' '),"<br>",
+                                                               paste(c('Data Stars:',dataStars),collapse=' '),"<br>",
+                                                               paste(c('Speed Stars:',speedStars),collapse=' '),"<br>",
+                                                               paste(c('SMS Stars:',smsStars),collapse=' '),"<br>",
+                                                               paste(c('Overall Stars:',overallStars),collapse=' ')))%>%
     addCircles(lng=targ_latlon[2], lat=targ_latlon[1], popup=paste(radius_miles,'mile radius from',targ_locat),radius=radius_miles*meters_per_mile,color="#00ff00",fillOpacity=.1)%>%
     #addPolygons(lng=test_values_df$Longitude,lat=test_values_df$Latitude,data=group_by(test_values_df,Group), color=I("#FF0000"),opacity=.4)
     addCircles(lng=test_subset$end_lon, lat=test_subset$end_lat, weight = 3, radius=40, 
                color="#ff0000", stroke = TRUE, fillOpacity = 0.8)
   m
+  
+  
+  
+  
+  
 }
-
-
-calculate_star_values = function(test_data,carriers=c('AT&T','Sprint','T-Mobile','Verizon')){
-  carrier_names=c('AT&T','Sprint','T-Mobile','Verizon')
-  output_df = data.frame(matrix(0,ncol=5,nrow=length(carriers)))
-  colnames(output_df) = c('call','data','sms','speed','overall')
-  for (i in 1:length(carriers)){
-    carrier = carriers[i]
-    carrier_id = which(carrier_names==carrier)
-    test_subset = test_data[which(test_data$carrier_id==carrier_id),]
-    
-    
-    ## call metrics
-    co_block = length(which(as.character(test_subset$flag_access_success)=='f' & test_subset$test_type_id==16))  /   length(which(as.character(test_subset$flag_access_success)!='' & test_subset$test_type_id==16))
-    co_drop = length(which(as.character(test_subset$co_flag_retain_success)=='f' & test_subset$test_type_id==16))  /   length(which(as.character(test_subset$co_flag_retain_success)!='' & test_subset$test_type_id==16))
-    m2mo_block = length(which(as.character(test_subset$flag_access_success)=='f' & test_subset$test_type_id==23))  /   length(which(as.character(test_subset$flag_access_success)!='' & test_subset$test_type_id==23))
-    
-    ## data metrics
-    ldrs_task_success = mean(na.omit(test_subset$percentage_task_success[which(test_subset$test_type_id==26)]))
-    dsd_task_success = mean(na.omit(test_subset$percentage_task_success[which(test_subset$test_type_id==20)]))
-    dsu_task_success = mean(na.omit(test_subset$percentage_task_success[which(test_subset$test_type_id==19)]))
-    percentDLThrough=sum(!is.na(test_data$dsd_effective_download_test_speed)&test_data$dsd_effective_download_test_speed>=1000)/sum(!is.na(test_data$dsd_effective_download_test_speed))
-    # % UL Through (dsu_effective_upload_test_speed >= 500)/count(dsu_effective_upload_test_speed) -- where dsdu_effective_upload_test_speed not NULL
-    percentULThrough=sum(!is.na(test_data$dsu_effective_upload_test_speed)&test_data$dsu_effective_upload_test_speed>=500)/sum(!is.na(test_data$dsd_effective_download_test_speed))
-    #UDP Packet Drop Rate mean(udp_packet_drop_rate) -- where test_type_id = 25
-    UDP_dat_mean=0#####mean(na.omit(test_data[which(test_data$test_type_id==25),]$udp_avg_packet_drop))
-    
-    #speed metrics
-    dsd_effective_throughput_05p = as.numeric(quantile(na.omit(test_subset$dsd_effective_download_test_speed[which(test_subset$test_type_id==20)]),.05))
-    dsd_time_to_first_byte_50p=as.numeric(quantile(na.omit(test_subset$dsd_time_to_first_byte_median[which(test_subset$test_type_id==20)]),.5))
-    dsd_effective_throughput_95p =as.numeric(quantile(na.omit(test_subset$dsd_effective_download_test_speed[which(test_subset$test_type_id==20)]),.95))
-    dsu_effective_throughput_05p=as.numeric(quantile(na.omit(test_subset$dsu_effective_upload_test_speed[which(test_subset$test_type_id==19)]),.05))
-    liteData95Quant=0#quantile(na.omit(test_subset[which(test_subset$test_type_id==26),]$ldrs_task_speed_max),probs=c(.95))
-    MM95Quant=0#quantile(na.omit(test_data[which(test_data$test_type_id==23 & tmp_testDat_1$flag_access_success=='t'),]$m2mo_total_call_setup_duration),probs=c(.95))
-    
-    
-    callStars = dataStars = speedStars = smsStars = overallStars=0
-    
-    # assign call stars
-    #mobile to landline call drop
-    callStars=callStars+ifelse(co_drop<=.01,2.5,ifelse(co_drop<=.015,2,ifelse(co_drop<=.02,1.5,ifelse(co_drop<=.025,1,ifelse(co_drop<=.03,.5,0)))))
-    #mobile to landline call block
-    callStars=callStars+ifelse(co_block<=.002,1.5,ifelse(co_block<=.005,1,ifelse(co_block<=.01,.5,0)))
-    #mobile to landline call block
-    callStars=callStars+ifelse(m2mo_block<=.015,1,ifelse(m2mo_block<=.02,.5,0))
-    
-    
-    #assign data stars
-    #Lite Data Secure
-    dataStars=dataStars+ifelse(ldrs_task_success>=.99,.5,0)
-    # Download Task Success
-    dataStars=dataStars+ifelse(dsd_task_success>=.99,.5,0)
-    # % DL Throughput
-    dataStars=dataStars+ifelse(percentDLThrough>=.97,2,ifelse(percentDLThrough>=.95,1.5,ifelse(percentDLThrough>=.92,1,ifelse(percentDLThrough>=.9,.5,0))))
-    # Upload Task
-    dataStars=dataStars+ifelse(dsd_task_success>=.99,.5,0)
-    # 
-    dataStars=dataStars+ifelse(percentULThrough>=.97,1,ifelse(percentULThrough>=.92,.5,0))
-    #Currently missing this data......
-    dataStars=dataStars+ifelse(UDP_dat_mean<=.05,.5,0)
-    
-    
-    
-    
-    #assign speed stars
-    #Calculate Speed and Performance stars for each of the regions
-    speedStars=speedStars+ifelse(dsd_effective_throughput_05p>=5000,1.5,ifelse(dsd_effective_throughput_05p>=3000,1,ifelse(dsd_effective_throughput_05p>=2000,0.5,0)))
-    
-    speedStars=speedStars+ifelse(dsd_time_to_first_byte_50p<=400,1,ifelse(dsd_time_to_first_byte_50p<=700,0.5,0))
-    
-    speedStars=speedStars+ifelse(dsd_effective_throughput_95p>=75000,.5,0)
-    
-    speedStars=speedStars+ifelse(dsu_effective_throughput_05p>=1500,1,ifelse(dsu_effective_throughput_05p>=1000,0.5,0)) 
-    
-    #need this val
-    speedStars=speedStars+ifelse(liteData95Quant<=1000,.5,0)
-    
-    speedStars=speedStars+ifelse(MM95Quant<=7000,.5,0)
-    
-    overallStars = round(.8*callStars+.55*speedStars+.55*dataStars+.1*smsStars)/2
-    
-    output_df[i,] = c(callStars,dataStars,smsStars,speedStars,overallStars)
-    
-  }
-  return(output_df)
-}
-
-
-
-
 
