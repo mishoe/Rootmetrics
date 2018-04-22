@@ -1,6 +1,13 @@
+#  John's Path
 market_data<-read.csv("C:/Users/john_allen/Documents/cofc/Operations Research/data for root metrics/rating_data/rating_data/market_report_sets_ratings_2H2017.csv",header=T)
 test_data<-read.csv("C:/Users/john_allen/Documents/cofc/Operations Research/data for root metrics/rating_data/rating_data/test_summary_ratings_2h2017.csv",header=T)
 rootscore_data<-read.csv('C:/Users/john_allen/Documents/cofc/Operations Research/data for root metrics/rating_data/rating_data/rootscore_ranks_2H2017.csv',header = T)
+#  Austin's Path
+# market_data<-read.csv("rating_data/rating_data/market_report_sets_ratings_2H2017.csv",header=T)
+# test_data<-read.csv("test_summary_data/test_summary_ratings_2h2017.csv",header=T)
+# rootscore_data<-read.csv('rating_data/rating_data/rootscore_ranks_2H2017.csv',header = T)
+# collection_sets<-read.csv('rating_data/rating_data/collection_sets_2H2017.csv',header = T)
+# 
 
 
 # 1-AT&T 2-Sprint 3-T-Mobile 4-Verizon

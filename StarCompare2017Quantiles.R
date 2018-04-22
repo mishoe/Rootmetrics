@@ -177,7 +177,7 @@ for(carrier_id in 1:length(carriers)){
     # % DL Throughput
     dataStars_1[i]=dataStars_1[i]+ifelse(percentDLThrough>=dlt2.0,2,ifelse(percentDLThrough>=dlt1.5,1.5,ifelse(percentDLThrough>=dlt1.0,1,ifelse(percentDLThrough>=dlt.5,.5,0))))
     # Upload Task
-    dataStars_1[i]=dataStars_1[i]+ifelse(market_data_1$dsd_task_success[data_ind_1[i]]>=uts,.5,0)
+    dataStars_1[i]=dataStars_1[i]+ifelse(market_data_1$dsu_task_success[data_ind_1[i]]>=uts,.5,0)
     # % UL Through (dsu_effective_upload_test_speed >= 500)/count(dsu_effective_upload_test_speed) -- where dsdu_effective_upload_test_speed not NULL
     percentULThrough=sum(!is.na(tmp_testDat_1$dsu_effective_upload_test_speed)&tmp_testDat_1$dsu_effective_upload_test_speed>=500)/sum(!is.na(tmp_testDat_1$dsd_effective_download_test_speed))
     dataStars_1[i]=dataStars_1[i]+ifelse(percentULThrough>=ult1.0,1,ifelse(percentULThrough>=ult.5,.5,0))
@@ -196,7 +196,7 @@ for(carrier_id in 1:length(carriers)){
     # % DL Throughput
     dataStars_2[i]=dataStars_2[i]+ifelse(percentDLThrough>=dlt2.0,2,ifelse(percentDLThrough>=dlt1.5,1.5,ifelse(percentDLThrough>=dlt1.0,1,ifelse(percentDLThrough>=dlt.5,.5,0))))
     # Upload Task
-    dataStars_2[i]=dataStars_2[i]+ifelse(market_data_2$dsd_task_success[data_ind_2[i]]>=uts,.5,0)
+    dataStars_2[i]=dataStars_2[i]+ifelse(market_data_2$dsu_task_success[data_ind_2[i]]>=uts,.5,0)
     # % UL Through (dsu_effective_upload_test_speed >= 500)/count(dsu_effective_upload_test_speed) -- where dsdu_effective_upload_test_speed not NULL
     percentULThrough=sum(!is.na(tmp_testDat_2$dsu_effective_upload_test_speed)&tmp_testDat_2$dsu_effective_upload_test_speed>=500)/sum(!is.na(tmp_testDat_2$dsd_effective_download_test_speed))
     dataStars_2[i]=dataStars_2[i]+ifelse(percentULThrough>=ult1.0,1,ifelse(percentULThrough>=ult.5,.5,0))
