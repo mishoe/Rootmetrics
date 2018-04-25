@@ -8,6 +8,7 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   library(RJSONIO)
   library(RCurl)
   library(leaflet)
+  library(htmltools)
   google_api_key = "AIzaSyDxY76Lf1EjK1T3sY-ViCrt5qvtZE3Uwk0"
   Sys.setenv('MAPBOX_TOKEN' = 'pk.eyJ1IjoiYWxsZW5yZW5jaDIyMiIsImEiOiJjamV4MTZ2anYxMnh2MndvNDQ4MDBzNjRkIn0.RD3zOxD_veDhoQG1wmHqiA')
   pre_path = ifelse(in_app==TRUE, '../','')
@@ -146,18 +147,22 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   
   m <- leaflet() %>%
     addTiles() %>%  # Add default OpenStreetMap map tiles
-
-    addCircles(lng=targ_latlon[2], lat=targ_latlon[1], popup=paste(radius_miles,'mile radius from',targ_locat),radius=radius_miles*meters_per_mile,color="#00ff00",fillOpacity=.1)%>%
+    #addProviderTiles(providers$Esri.NatGeoWorldMap)%>%
+    addCircles(lng=targ_latlon[2], lat=targ_latlon[1],radius=radius_miles*meters_per_mile,fillColor='#7d78bc',color="#7d78bc",fillOpacity=.1,opacity=.4,
+               label=htmltools::HTML(paste("<div style='font-size:12px;width:200px;font-weight:bold;float:left'>",
+                                           targ_locat,"<br/>",
+                                           "<span style='font-size:11px;font-weight:normal'>",
+                                           paste(c(radius_miles,'mile radius for',carrier,':'),collapse=' '),"<br/>",
+                                           paste(c('Call Stars:',callStars),collapse=' '),"<br/>",
+                                           paste(c('Data Stars:',dataStars),collapse=' '),"<br/>",
+                                           paste(c('Speed Stars:',speedStars),collapse=' '),"<br/>",
+                                           paste(c('SMS Stars:',smsStars,'N/A'),collapse=' '),"<br/>",
+                                           paste(c('Overall Stars:',overallStars),collapse=' '),'</span>','</div>',sep=''))
+                 
+                 )%>%
     #addPolygons(lng=test_values_df$Longitude,lat=test_values_df$Latitude,data=group_by(test_values_df,Group), color=I("#FF0000"),opacity=.4)
     addCircles(lng=test_subset$end_lon, lat=test_subset$end_lat, weight = 3, radius=40, 
-               color="#ff0000", stroke = TRUE, fillOpacity = 0.8)%>%
-    addMarkers(lng=targ_latlon[2], lat=targ_latlon[1], popup=paste(targ_locat,"<br>",
-               paste(c('Using a',radius_miles,'mile radius of test data around the location,',carrier,'acheived the following scores:'),collapse=' '),"<br>",
-               paste(c('Call Stars:',callStars),collapse=' '),"<br>",
-               paste(c('Data Stars:',dataStars),collapse=' '),"<br>",
-               paste(c('Speed Stars:',speedStars),collapse=' '),"<br>",
-               paste(c('SMS Stars:',smsStars),collapse=' '),"<br>",
-               paste(c('Overall Stars:',overallStars),collapse=' ')))
+               color="#ff0000", stroke = TRUE, fillOpacity = 0.8)
   m
   
   
