@@ -57,22 +57,21 @@ for(carrier_id in 1:length(carriers)){
     id=market_data$collection_set_id[data_ind[i]] #set id equal to the area id for each iteration
     tmp_testDat=test_subset[which(test_subset$collection_set_id==id),] #subset the test_subset by selecting rows corresponding to the area id
 
-    smsStars[i] = smsStars[i]+if(market_data[data_ind[i],6]>=.99){1}else if(market_data[data_ind[i],6]>=.97){.5}else{0}
-    smsStars[i] = smsStars[i]+if(market_data[data_ind[i],7]>=.99){1}else if(market_data[data_ind[i],7]>=.97){.5}else{0}
-    smsStars[i] = smsStars[i]+if(market_data[data_ind[i],8]>=.99){1}else if(market_data[data_ind[i],8]>=.97){.5}else{0}
-    smsStars[i] = smsStars[i]+if(market_data[data_ind[i],9]>=.99){1}else if(market_data[data_ind[i],9]>=.97){.5}else{0}
-    smsStars[i] = smsStars[i]+if(market_data[data_ind[i],10]>=.98){.5}else{0}
+    smsStars[i] = smsStars[i]+if(market_data$sms_access_success_inter[data_ind[i]]>=.99){1}else if(market_data$sms_access_success_inter[data_ind[i]]>=.97){.5}else{0}
+    smsStars[i] = smsStars[i]+if(market_data$sms_access_success_intra[data_ind[i]]>=.99){1}else if(market_data$sms_access_success_intra[data_ind[i]]>=.97){.5}else{0}
+    smsStars[i] = smsStars[i]+if(market_data$sms_task_success_inter[data_ind[i]]>=.99){1}else if(market_data$sms_task_success_inter[data_ind[i]]>=.97){.5}else{0}
+    smsStars[i] = smsStars[i]+if(market_data$sms_task_success_intra[data_ind[i]]>=.99){1}else if(market_data$sms_task_success_intra[data_ind[i]]>=.97){.5}else{0}
+    smsStars[i] = smsStars[i]+if(market_data$ldrs_task_success[data_ind[i]]>=.98){.5}else{0}
     
-    #### come back to this......
     indTest<-length(which(na.omit(tmp_testDat[which(tmp_testDat$test_type_id==26),]$ldrs_task_speed_max)<2000))/length(na.omit(tmp_testDat[which(tmp_testDat$test_type_id==26),]$ldrs_task_speed_max))
     smsStars[i]<-smsStars[i]+if(indTest<=.98){.5}else{0}
     
     
-    sms_df[1,carrier_id] = sms_df[1,carrier_id] + if(market_data[data_ind[i],6]>=.99){1}else if(market_data[data_ind[i],6]>=.97){.5}else{0}
-    sms_df[2,carrier_id] = sms_df[2,carrier_id] + if(market_data[data_ind[i],7]>=.99){1}else if(market_data[data_ind[i],7]>=.97){.5}else{0}
-    sms_df[3,carrier_id] = sms_df[3,carrier_id] + if(market_data[data_ind[i],8]>=.99){1}else if(market_data[data_ind[i],8]>=.97){.5}else{0}
-    sms_df[4,carrier_id] = sms_df[4,carrier_id] + if(market_data[data_ind[i],9]>=.99){1}else if(market_data[data_ind[i],9]>=.97){.5}else{0}
-    sms_df[5,carrier_id] = sms_df[5,carrier_id] + if(market_data[data_ind[i],10]>=.98){.5}else{0}
+    sms_df[1,carrier_id] = sms_df[1,carrier_id] + if(market_data$sms_access_success_inter[data_ind[i]]>=.99){1}else if(market_data$sms_access_success_inter[data_ind[i]]>=.97){.5}else{0}
+    sms_df[2,carrier_id] = sms_df[2,carrier_id] + if(market_data$sms_access_success_intra[data_ind[i]]>=.99){1}else if(market_data$sms_access_success_intra[data_ind[i]]>=.97){.5}else{0}
+    sms_df[3,carrier_id] = sms_df[3,carrier_id] + if(market_data$sms_task_success_inter[data_ind[i]]>=.99){1}else if(market_data$sms_task_success_inter[data_ind[i]]>=.97){.5}else{0}
+    sms_df[4,carrier_id] = sms_df[4,carrier_id] + if(market_data$sms_task_success_intra[data_ind[i]]>=.99){1}else if(market_data$sms_task_success_intra[data_ind[i]]>=.97){.5}else{0}
+    sms_df[5,carrier_id] = sms_df[5,carrier_id] + if(market_data$ldrs_task_success[data_ind[i]]>=.98){.5}else{0}
     sms_df[6,carrier_id] = sms_df[6,carrier_id] + if(indTest<=.98){.5}else{0}
     
     #mobile to landline call drop
@@ -163,11 +162,22 @@ if(save){
   write.csv(speed_df,paste(c(save_directory,"speed_breakdown_",which_half,'.csv'),collapse = ''))
 }
 
+if(which_half=='1H2017'){
+  call_df1 = call_df
+  data_df1 = data_df
+  sms_df1 = sms_df
+  speed_df1 = speed_df
+}else if(which_half=='2H2017'){
+  call_df2 = call_df
+  data_df2 = data_df
+  sms_df2= sms_df
+  speed_df2 = speed_df
+}
 
-call_change_df = call_df[,-5]-call_df1[,-5]
-data_change_df = data_df[,-5]-data_df1[,-5]
-sms_change_df = sms_df[,-5]-sms_df1[,-5]
-speed_change_df = speed_df[,-5]-speed_df1[,-5]
+call_change_df = call_df2[,-5]-call_df1[,-5]
+data_change_df = data_df2[,-5]-data_df1[,-5]
+sms_change_df = sms_df2[,-5]-sms_df1[,-5]
+speed_change_df = speed_df2[,-5]-speed_df1[,-5]
 
 
 ## save the RootScore Rank values from 1H to 2H of 2017

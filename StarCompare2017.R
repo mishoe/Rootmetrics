@@ -63,26 +63,13 @@ for(carrier_id in 1:length(carriers)){
     smsStars_2[i] = smsStars_2[i]+if(market_data_2$`sms_task_success_intra`[data_ind_2[i]]>=.99){1}else if(market_data_2$`sms_task_success_intra`[data_ind_2[i]]>=.97){.5}else{0}
     smsStars_2[i] = smsStars_2[i]+if(market_data_2$`ldrs_task_success`[data_ind_2[i]]>=.97){.5}else{0}
     
-    smsVector[1]=smsVector[1]+if(market_data_1$`sms_access_success_inter`[data_ind_1[i]]>=.99){1}else if(market_data_1$`sms_access_success_inter`[data_ind_1[i]]>=.97){.5}else{0}
-    smsVector[2]=smsVector[2]+if(market_data_1$`sms_access_success_intra`[data_ind_1[i]]>=.99){1}else if(market_data_1$`sms_access_success_intra`[data_ind_1[i]]>=.97){.5}else{0}
-    smsVector[3]=smsVector[3]+if(market_data_1$`sms_task_success_inter`[data_ind_1[i]]>=.99){1}else if(market_data_1$`sms_task_success_inter`[data_ind_1[i]]>=.97){.5}else{0}
-    smsVector[4]=smsVector[4]+if(market_data_1$`sms_task_success_intra`[data_ind_1[i]]>=.99){1}else if(market_data_1$`sms_task_success_intra`[data_ind_1[i]]>=.97){.5}else{0}
-    smsVector[5]=smsVector[5]+if(market_data_1$`ldrs_task_success`[data_ind_1[i]]>=.97){.5}else{0}
-    smsVector[6]=smsVector[6]+if(market_data_2$`sms_access_success_inter`[data_ind_2[i]]>=.99){1}else if(market_data_2$`sms_access_success_inter`[data_ind_2[i]]>=.97){.5}else{0}
-    smsVector[7]=smsVector[7]+if(market_data_2$`sms_access_success_intra`[data_ind_2[i]]>=.99){1}else if(market_data_2$`sms_access_success_intra`[data_ind_2[i]]>=.97){.5}else{0}
-    smsVector[8]=smsVector[8]+if(market_data_2$`sms_task_success_inter`[data_ind_2[i]]>=.99){1}else if(market_data_2$`sms_task_success_inter`[data_ind_2[i]]>=.97){.5}else{0}
-    smsVector[9]=smsVector[9]+if(market_data_2$`sms_task_success_intra`[data_ind_2[i]]>=.99){1}else if(market_data_2$`sms_task_success_intra`[data_ind_2[i]]>=.97){.5}else{0}
-    smsVector[10]=smsVector[10]+if(market_data_2$`ldrs_task_success`[data_ind_2[i]]>=.97){.5}else{0}
-
     #### come back to this......
     indTest<-length(which(na.omit(tmp_testDat_1[which(tmp_testDat_1$test_type_id==26),]$ldrs_task_speed_max)<2000))/length(na.omit(tmp_testDat_1[which(tmp_testDat_1$test_type_id==26),]$ldrs_task_speed_max))
     smsStars_1[i]<-smsStars_1[i]+if(indTest<=.98){.5}else{0}
-    smsVector[11]=smsVector[11]+if(indTest<=.98){.5}else{0}
     
     
     indTest<-length(which(na.omit(tmp_testDat_2[which(tmp_testDat_2$test_type_id==26),]$ldrs_task_speed_max)<2000))/length(na.omit(tmp_testDat_2[which(tmp_testDat_2$test_type_id==26),]$ldrs_task_speed_max))
     smsStars_2[i]<-smsStars_2[i]+if(indTest<=.98){.5}else{0}
-    smsVector[12]=smsVector[12]+if(indTest<=.98){.5}else{0}
     
     #mobile to landline call drop
     callStars_1[i]=callStars_1[i]+ifelse(market_data_1$co_drop[data_ind_1[i]]<=.01,2.5,ifelse(market_data_1$co_drop[data_ind_1[i]]<=.015,2,ifelse(market_data_1$co_drop[data_ind_1[i]]<=.02,1.5,ifelse(market_data_1$co_drop[data_ind_1[i]]<=.025,1,ifelse(market_data_1$co_drop[data_ind_1[i]]<=.03,.5,0)))))
@@ -345,29 +332,29 @@ col_mat = matrix(c(0,159,219, 251,223,0, 227,0,116,236,7,16), # the data element
 ########## Plot the RootStars Raw
 for(i in 1:length(carriers)){
   
-  png(filename = paste("Plots/1H/speed_star_raw_",carriers[i],'_1H2017.png'))
+  png(filename = paste("Plots/1H/raw/speed_star_raw_",carriers[i],'_1H2017.png'))
   hist(speedStars_df_1[,i],breaks = seq(0,5, .5),xlab='RootStars',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStars for ',carriers[i],' 1H 2017 in Speed'))
   dev.off()
-  png(filename = paste("Plots/1H/call_star_raw_",carriers[i],'_1H2017.png'))
+  png(filename = paste("Plots/1H/raw/call_star_raw_",carriers[i],'_1H2017.png'))
   hist(callStars_df_1[,i],breaks = seq(0,5,.5),xlab='RootStars',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStars for ',carriers[i],' 1H 2017 in Call'))
   dev.off()
-  png(filename = paste("Plots/1H/data_star_raw_",carriers[i],'_1H2017.png'))
+  png(filename = paste("Plots/1H/raw/data_star_raw_",carriers[i],'_1H2017.png'))
   hist(dataStars_df_1[,i],breaks = seq(0,5,.5),xlab='RootStars',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStars for ',carriers[i],' 1H 2017 in Data'))
   dev.off()
-  png(filename = paste("Plots/1H/sms_star_raw_",carriers[i],'_1H2017.png'))
+  png(filename = paste("Plots/1H/raw/sms_star_raw_",carriers[i],'_1H2017.png'))
   hist(smsStars_df_1[,i],breaks = seq(0,5,.5),xlab='RootStars',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStars for ',carriers[i],' 1H 2017 in SMS'))
   dev.off()
   
-  png(filename = paste("Plots/2H/speed_star_raw_",carriers[i],'_2H2017.png'))
+  png(filename = paste("Plots/2H/raw/speed_star_raw_",carriers[i],'_2H2017.png'))
   hist(speedStars_df_2[,i],breaks = seq(0,5,.5),xlab='RootStars',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStars for ',carriers[i],' 2H 2017 in Speed'))
   dev.off()
-  png(filename = paste("Plots/2H/call_star_raw_",carriers[i],'_2H2017.png'))
+  png(filename = paste("Plots/2H/raw/call_star_raw_",carriers[i],'_2H2017.png'))
   hist(callStars_df_1[,i],breaks = seq(0,5,.5),xlab='RootStars',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStars for ',carriers[i],' 2H 2017 in Call'))
   dev.off()
-  png(filename = paste("Plots/2H/data_star_raw_",carriers[i],'_2H2017.png'))
+  png(filename = paste("Plots/2H/raw/data_star_raw_",carriers[i],'_2H2017.png'))
   hist(dataStars_df_1[,i],breaks = seq(0,5,.5),xlab='RootStars',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStars for ',carriers[i],' 2H 2017 in Data'))
   dev.off()
-  png(filename = paste("Plots/2H/sms_star_raw_",carriers[i],'_2H2017.png'))
+  png(filename = paste("Plots/2H/raw/sms_star_raw_",carriers[i],'_2H2017.png'))
   hist(smsStars_df_1[,i],breaks = seq(0,5,.5),xlab='RootStars',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStars for ',carriers[i],' 2H 2017 in SMS'))
   dev.off()
 }
@@ -376,29 +363,29 @@ for(i in 1:length(carriers)){
  ########## Plot the RootStars Rank (position each carrier came in over all locations)
  for(i in 1:length(carriers)){
    
-   png(filename = paste("Plots/1H/speed_star_rank_",carriers[i],'_1H2017.png'))
+   png(filename = paste("Plots/1H/rank/speed_star_rank_",carriers[i],'_1H2017.png'))
    hist(speedStarsRank_df_1[,i],breaks = seq(0,4,1),xlab='RootStar Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStar Positions for ',carriers[i],' 1H 2017 in Speed'))
    dev.off()
-   png(filename = paste("Plots/1H/call_star_rank_",carriers[i],'_1H2017.png'))
+   png(filename = paste("Plots/1H/rank/call_star_rank_",carriers[i],'_1H2017.png'))
    hist(callStarsRank_df_1[,i],breaks = seq(0,4,1),xlab='RootStar Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStar Positions for ',carriers[i],' 1H 2017 in Call'))
    dev.off()
-   png(filename = paste("Plots/1H/data_star_rank_",carriers[i],'_1H2017.png'))
+   png(filename = paste("Plots/1H/rank/data_star_rank_",carriers[i],'_1H2017.png'))
    hist(dataStarsRank_df_1[,i],breaks = seq(0,4,1),xlab='RootStar Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStar Positions for ',carriers[i],' 1H 2017 in Data'))
    dev.off()
-   png(filename = paste("Plots/1H/sms_star_rank_",carriers[i],'_1H2017.png'))
+   png(filename = paste("Plots/1H/rank/sms_star_rank_",carriers[i],'_1H2017.png'))
    hist(smsStarsRank_df_1[,i],breaks = seq(0,4,1),xlab='RootStar Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStar Positions for ',carriers[i],' 1H 2017 in SMS'))
    dev.off()
    
-   png(filename = paste("Plots/2H/speed_star_rank_",carriers[i],'_2H2017.png'))
+   png(filename = paste("Plots/2H/rank/speed_star_rank_",carriers[i],'_2H2017.png'))
    hist(speedStarsRank_df_2[,i],breaks = seq(0,4,1),xlab='RootStar Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStar Positions for ',carriers[i],' 2H 2017 in Speed'))
    dev.off()
-   png(filename = paste("Plots/2H/call_star_rank_",carriers[i],'_2H2017.png'))
+   png(filename = paste("Plots/2H/rank/call_star_rank_",carriers[i],'_2H2017.png'))
    hist(callStarsRank_df_1[,i],breaks = seq(0,4,1),xlab='RootStar Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStar Positions for ',carriers[i],' 2H 2017 in Call'))
    dev.off()
-   png(filename = paste("Plots/2H/data_star_rank_",carriers[i],'_2H2017.png'))
+   png(filename = paste("Plots/2H/rank/data_star_rank_",carriers[i],'_2H2017.png'))
    hist(dataStarsRank_df_1[,i],breaks = seq(0,4,1),xlab='RootStar Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStar Positions for ',carriers[i],' 2H 2017 in Data'))
    dev.off()
-   png(filename = paste("Plots/2H/sms_star_rank_",carriers[i],'_2H2017.png'))
+   png(filename = paste("Plots/2H/rank/sms_star_rank_",carriers[i],'_2H2017.png'))
    hist(smsStarsRank_df_1[,i],breaks = seq(0,4,1),xlab='RootStar Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootStar Positions for ',carriers[i],' 2H 2017 in SMS'))
    dev.off()
  }
@@ -406,29 +393,29 @@ for(i in 1:length(carriers)){
 ########## Plot the RootScores Raw
 for(i in 1:length(carriers)){
   
-  png(filename = paste("Plots/1H/speed_score_raw_",carriers[i],'_1H2017.png'))
+  png(filename = paste("Plots/1H/raw/speed_score_raw_",carriers[i],'_1H2017.png'))
   hist(speedScores_df_1[which(speedScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 1H 2017 in Speed'))
   dev.off()
-  png(filename = paste("Plots/1H/call_score_raw_",carriers[i],'_1H2017.png'))
+  png(filename = paste("Plots/1H/raw/call_score_raw_",carriers[i],'_1H2017.png'))
   hist(callScores_df_1[which(callScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 1H 2017 in Call'))
   dev.off()
-  png(filename = paste("Plots/1H/data_score_raw_",carriers[i],'_1H2017.png'))
+  png(filename = paste("Plots/1H/raw/data_score_raw_",carriers[i],'_1H2017.png'))
   hist(dataScores_df_1[which(dataScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 1H 2017 in Data'))
   dev.off()
-  png(filename = paste("Plots/1H/sms_score_raw_",carriers[i],'_1H2017.png'))
+  png(filename = paste("Plots/1H/raw/sms_score_raw_",carriers[i],'_1H2017.png'))
   hist(smsScores_df_1[which(smsScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 1H 2017 in SMS'))
   dev.off()
   
-  png(filename = paste("Plots/2H/speed_score_raw_",carriers[i],'_2H2017.png'))
+  png(filename = paste("Plots/2H/raw/speed_score_raw_",carriers[i],'_2H2017.png'))
   hist(speedScores_df_2[which(speedScores_df_2[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 2H 2017 in Speed'))
   dev.off()
-  png(filename = paste("Plots/2H/call_score_raw_",carriers[i],'_2H2017.png'))
+  png(filename = paste("Plots/2H/raw/call_score_raw_",carriers[i],'_2H2017.png'))
   hist(callScores_df_1[which(callScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 2H 2017 in Call'))
   dev.off()
-  png(filename = paste("Plots/2H/data_score_raw_",carriers[i],'_2H2017.png'))
+  png(filename = paste("Plots/2H/raw/data_score_raw_",carriers[i],'_2H2017.png'))
   hist(dataScores_df_1[which(dataScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 2H 2017 in Data'))
   dev.off()
-  png(filename = paste("Plots/2H/sms_score_raw_",carriers[i],'_2H2017.png'))
+  png(filename = paste("Plots/2H/raw/sms_score_raw_",carriers[i],'_2H2017.png'))
   hist(smsScores_df_1[which(smsScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 2H 2017 in SMS'))
   dev.off()
 }
@@ -436,29 +423,29 @@ for(i in 1:length(carriers)){
 ########## Plot the RootStars Rank (position each carrier came in over all locations)
 for(i in 1:length(carriers)){
   
-  png(filename = paste("Plots/1H/speed_score_rank_",carriers[i],'_1H2017.png'))
+  png(filename = paste("Plots/1H/rank/speed_score_rank_",carriers[i],'_1H2017.png'))
   hist(speedScoresRank_df_1[,i],breaks = seq(.5,4.5,1),xlab='RootScore Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScore Positions for ',carriers[i],' 1H 2017 in Speed'))
   dev.off()
-  png(filename = paste("Plots/1H/call_score_rank_",carriers[i],'_1H2017.png'))
+  png(filename = paste("Plots/1H/rank/call_score_rank_",carriers[i],'_1H2017.png'))
   hist(callScoresRank_df_1[,i],breaks = seq(0.5,4.5,1),xlab='RootScore Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScore Positions for ',carriers[i],' 1H 2017 in Call'))
   dev.off()
-  png(filename = paste("Plots/1H/data_score_rank_",carriers[i],'_1H2017.png'))
+  png(filename = paste("Plots/1H/rank/data_score_rank_",carriers[i],'_1H2017.png'))
   hist(dataScoresRank_df_1[,i],breaks = seq(0.5,4.5,1),xlab='RootScore Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScore Positions for ',carriers[i],' 1H 2017 in Data'))
   dev.off()
-  png(filename = paste("Plots/1H/sms_score_rank_",carriers[i],'_1H2017.png'))
+  png(filename = paste("Plots/1H/rank/sms_score_rank_",carriers[i],'_1H2017.png'))
   hist(smsScoresRank_df_1[,i],breaks = seq(0.5,4.5,1),xlab='RootScore Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScore Positions for ',carriers[i],' 1H 2017 in SMS'))
   dev.off()
   
-  png(filename = paste("Plots/2H/speed_score_rank_",carriers[i],'_2H2017.png'))
+  png(filename = paste("Plots/2H/rank/speed_score_rank_",carriers[i],'_2H2017.png'))
   hist(speedScoresRank_df_2[,i],breaks = seq(0.5,4.5,1),xlab='RootScore Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScore Positions for ',carriers[i],' 2H 2017 in Speed'))
   dev.off()
-  png(filename = paste("Plots/2H/call_score_rank_",carriers[i],'_2H2017.png'))
+  png(filename = paste("Plots/2H/rank/call_score_rank_",carriers[i],'_2H2017.png'))
   hist(callScoresRank_df_1[,i],breaks = seq(0.5,4.5,1),xlab='RootScore Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScore Positions for ',carriers[i],' 2H 2017 in Call'))
   dev.off()
-  png(filename = paste("Plots/2H/data_score_rank_",carriers[i],'_2H2017.png'))
+  png(filename = paste("Plots/2H/rank/data_score_rank_",carriers[i],'_2H2017.png'))
   hist(dataScoresRank_df_1[,i],breaks = seq(0.5,4.5,1),xlab='RootScore Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScore Positions for ',carriers[i],' 2H 2017 in Data'))
   dev.off()
-  png(filename = paste("Plots/2H/sms_score_rank_",carriers[i],'_2H2017.png'))
+  png(filename = paste("Plots/2H/rank/sms_score_rank_",carriers[i],'_2H2017.png'))
   hist(smsScoresRank_df_1[,i],breaks = seq(0.5,4.5,1),xlab='RootScore Positions',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScore Positions for ',carriers[i],' 2H 2017 in SMS'))
   dev.off()
 }
@@ -467,16 +454,16 @@ for(i in 1:length(carriers)){
  #### create histograms for the change in stars from 1H to 2H 2017
  for(i in 1:length(carriers)){
    
-   png(filename = paste("Plots/Change/speed_star_raw_",carriers[i],'_compare2017.png'))
+   png(filename = paste("Plots/Change/raw/speed_star_raw_",carriers[i],'_compare2017.png'))
    hist(speedStars_df_2[,i]-speedStars_df_1[,i],breaks = seq(-5.5,5.5, .5),xlab='Change RootStars',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('Change in RootStars for ',carriers[i],' From 1H to 2H 2017 in Speed'))
    dev.off()
-   png(filename = paste("Plots/Change/call_star_raw_",carriers[i],'_compare2017.png'))
+   png(filename = paste("Plots/Change/raw/call_star_raw_",carriers[i],'_compare2017.png'))
    hist(callStars_df_2[,i]-callStars_df_1[,i],breaks = seq(-5.5,5.5,.5),xlab='Change RootStars',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('Change in RootStars for ',carriers[i],' From 1H to 2H 2017 in Call'))
    dev.off()
-   png(filename = paste("Plots/Change/data_star_raw_",carriers[i],'_compare2017.png'))
+   png(filename = paste("Plots/Change/raw/data_star_raw_",carriers[i],'_compare2017.png'))
    hist(dataStars_df_2[,i]-dataStars_df_1[,i],breaks = seq(-5.5,5.5,.5),xlab='Change RootStars',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('Change in RootStars for ',carriers[i],' From 1H to 2H 2017 in Data'))
    dev.off()
-   png(filename = paste("Plots/Change/sms_star_raw_",carriers[i],'_compare2017.png'))
+   png(filename = paste("Plots/Change/raw/sms_star_raw_",carriers[i],'_compare2017.png'))
    hist(smsStars_df_2[,i]-smsStars_df_1[,i],breaks = seq(-5.5,5.5,.5),xlab='Change RootStars',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('Change in RootStars for ',carriers[i],' From 1H to 2H 2017 in SMS'))
    dev.off()
  }
@@ -504,16 +491,16 @@ for(i in 1:length(carriers)){
  ########## Plot the the change in RootScores from 1H - 2H 2017
  for(i in 1:length(carriers)){
    
-   png(filename = paste("Plots/Change/speed_score_raw_",carriers[i],'_compare2017.png'))
+   png(filename = paste("Plots/Change/Raw/speed_score_raw_",carriers[i],'_compare2017.png'))
    hist((speedScores_df_2[,i]-speedScores_df_1[,i])[which(abs(speedScores_df_2[,i]-speedScores_df_1[,i])<15)],breaks = seq(-15,15, 1),xlab='Change RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('Change in RootScores for ',carriers[i],' From 1H to 2H 2017 in Speed'))
    dev.off()
-   png(filename = paste("Plots/Change/call_score_raw_",carriers[i],'_compare2017.png'))
+   png(filename = paste("Plots/Change/Raw/call_score_raw_",carriers[i],'_compare2017.png'))
    hist((callScores_df_2[,i]-callScores_df_1[,i])[which(abs(callScores_df_2[,i]-callScores_df_1[,i])<15)],breaks = seq(-15,15,1),xlab='Change RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('Change in RootScores for ',carriers[i],' From 1H to 2H 2017 in Call'))
    dev.off()
-   png(filename = paste("Plots/Change/data_score_raw_",carriers[i],'_compare2017.png'))
+   png(filename = paste("Plots/Change/Raw/data_score_raw_",carriers[i],'_compare2017.png'))
    hist((dataScores_df_2[,i]-dataScores_df_1[,i])[which(abs(dataScores_df_2[,i]-dataScores_df_1[,i])<15)],breaks = seq(-15,15,1),xlab='Change RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('Change in RootScores for ',carriers[i],' From 1H to 2H 2017 in Data'))
    dev.off()
-   png(filename = paste("Plots/Change/sms_score_raw_",carriers[i],'_compare2017.png'))
+   png(filename = paste("Plots/Change/Raw/sms_score_raw_",carriers[i],'_compare2017.png'))
    hist((smsScores_df_2[,i]-smsScores_df_1[,i])[which(abs(smsScores_df_2[,i]-smsScores_df_1[,i])<15)],breaks = seq(-15,15,1),xlab='Change RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('Change in RootScores for ',carriers[i],' From 1H to 2H 2017 in SMS'))
    dev.off()
  }
@@ -542,29 +529,29 @@ for(i in 1:length(carriers)){
  ########## Plot the RootScores as histograms
  for(i in 1:length(carriers)){
    
-   png(filename = paste("Plots/1H/speed_score_raw_",carriers[i],'_1H2017.png'))
+   png(filename = paste("Plots/1H/Raw/speed_score_raw_",carriers[i],'_1H2017.png'))
    hist(speedScores_df_1[which(speedScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 1H 2017 in Speed'))
    dev.off()
-   png(filename = paste("Plots/1H/call_score_raw_",carriers[i],'_1H2017.png'))
+   png(filename = paste("Plots/1H/Raw/call_score_raw_",carriers[i],'_1H2017.png'))
    hist(callScores_df_1[which(callScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 1H 2017 in Call'))
    dev.off()
-   png(filename = paste("Plots/1H/data_score_raw_",carriers[i],'_1H2017.png'))
+   png(filename = paste("Plots/1H/Raw/data_score_raw_",carriers[i],'_1H2017.png'))
    hist(dataScores_df_1[which(dataScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 1H 2017 in Data'))
    dev.off()
-   png(filename = paste("Plots/1H/sms_score_raw_",carriers[i],'_1H2017.png'))
+   png(filename = paste("Plots/1H/Raw/sms_score_raw_",carriers[i],'_1H2017.png'))
    hist(smsScores_df_1[which(smsScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 1H 2017 in SMS'))
    dev.off()
    
-   png(filename = paste("Plots/2H/speed_score_raw_",carriers[i],'_2H2017.png'))
+   png(filename = paste("Plots/2H/Raw/speed_score_raw_",carriers[i],'_2H2017.png'))
    hist(speedScores_df_2[which(speedScores_df_2[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 2H 2017 in Speed'))
    dev.off()
-   png(filename = paste("Plots/2H/call_score_raw_",carriers[i],'_2H2017.png'))
+   png(filename = paste("Plots/2H/Raw/call_score_raw_",carriers[i],'_2H2017.png'))
    hist(callScores_df_1[which(callScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 2H 2017 in Call'))
    dev.off()
-   png(filename = paste("Plots/2H/data_score_raw_",carriers[i],'_2H2017.png'))
+   png(filename = paste("Plots/2H/Raw/data_score_raw_",carriers[i],'_2H2017.png'))
    hist(dataScores_df_1[which(dataScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 2H 2017 in Data'))
    dev.off()
-   png(filename = paste("Plots/2H/sms_score_raw_",carriers[i],'_2H2017.png'))
+   png(filename = paste("Plots/2H/Raw/sms_score_raw_",carriers[i],'_2H2017.png'))
    hist(smsScores_df_1[which(smsScores_df_1[,i]>60),i],breaks = seq(60,100,.5),xlab='RootScores',col=rgb(col_mat[i,1],col_mat[i,2],col_mat[i,3],maxColorValue = 255),main = paste('RootScores for ',carriers[i],' 2H 2017 in SMS'))
    dev.off()
  }
@@ -591,7 +578,7 @@ colnames(call_hist)=colnames(speed_hist)=colnames(data_hist)=colnames(sms_hist)=
 rownames(call_hist)=rownames(speed_hist)=rownames(data_hist)=rownames(sms_hist)=carriers
 
 #Save data
-setwd('documents/Consulting/Rootmetrics')
+#setwd('documents/Consulting/Rootmetrics')
 
 ## save the RootStar values from 1H to 2H of 2017
 write.csv(callStars_df_1,"Data/1H/call_star_raw_1H2017.csv")

@@ -131,7 +131,8 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   speedStars=speedStars+ifelse(liteData95Quant<=1000,.5,0)
   
   speedStars=speedStars+ifelse(MM95Quant<=7000,.5,0)
-
+  
+  overallStars = round(.1*smsStars+.55*speedStars+.55*dataStars+.8*callStars)/2
   
   output_list = c(targ_locat,
              paste(c('Using a',radius_miles,'mile radius of test data around the location,',carrier,'acheived the following scores:'),collapse=' '),
@@ -145,17 +146,18 @@ generate_individ_scores<-function(targ_locat = "66 George St, Charleston, SC 294
   
   m <- leaflet() %>%
     addTiles() %>%  # Add default OpenStreetMap map tiles
-    addMarkers(lng=targ_latlon[2], lat=targ_latlon[1], popup=paste(targ_locat,"<br>",
-                                                               paste(c('Using a',radius_miles,'mile radius of test data around the location,',carrier,'acheived the following scores:'),collapse=' '),"<br>",
-                                                               paste(c('Call Stars:',callStars),collapse=' '),"<br>",
-                                                               paste(c('Data Stars:',dataStars),collapse=' '),"<br>",
-                                                               paste(c('Speed Stars:',speedStars),collapse=' '),"<br>",
-                                                               paste(c('SMS Stars:',smsStars),collapse=' '),"<br>",
-                                                               paste(c('Overall Stars:',overallStars),collapse=' ')))%>%
+
     addCircles(lng=targ_latlon[2], lat=targ_latlon[1], popup=paste(radius_miles,'mile radius from',targ_locat),radius=radius_miles*meters_per_mile,color="#00ff00",fillOpacity=.1)%>%
     #addPolygons(lng=test_values_df$Longitude,lat=test_values_df$Latitude,data=group_by(test_values_df,Group), color=I("#FF0000"),opacity=.4)
     addCircles(lng=test_subset$end_lon, lat=test_subset$end_lat, weight = 3, radius=40, 
-               color="#ff0000", stroke = TRUE, fillOpacity = 0.8)
+               color="#ff0000", stroke = TRUE, fillOpacity = 0.8)%>%
+    addMarkers(lng=targ_latlon[2], lat=targ_latlon[1], popup=paste(targ_locat,"<br>",
+               paste(c('Using a',radius_miles,'mile radius of test data around the location,',carrier,'acheived the following scores:'),collapse=' '),"<br>",
+               paste(c('Call Stars:',callStars),collapse=' '),"<br>",
+               paste(c('Data Stars:',dataStars),collapse=' '),"<br>",
+               paste(c('Speed Stars:',speedStars),collapse=' '),"<br>",
+               paste(c('SMS Stars:',smsStars),collapse=' '),"<br>",
+               paste(c('Overall Stars:',overallStars),collapse=' ')))
   m
   
   

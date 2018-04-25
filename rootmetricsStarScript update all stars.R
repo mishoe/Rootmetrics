@@ -41,16 +41,16 @@ for(carrier_id in 1:length(carriers)){
     id=market_data$collection_set_id[data_ind[i]] #set id equal to the area id for each iteration
     tmp_testDat=test_subset[which(test_subset$collection_set_id==id),] #subset the test_subset by selecting rows corresponding to the area id
 
-    smsStars[i] = smsStars[i]+if(market_data[data_ind[i],6]>=.99){1}else if(market_data[data_ind[i],6]>=.97){.5}else{0}
-    smsStars[i] = smsStars[i]+if(market_data[data_ind[i],7]>=.99){1}else if(market_data[data_ind[i],7]>=.97){.5}else{0}
-    smsStars[i] = smsStars[i]+if(market_data[data_ind[i],8]>=.99){1}else if(market_data[data_ind[i],8]>=.97){.5}else{0}
-    smsStars[i] = smsStars[i]+if(market_data[data_ind[i],9]>=.99){1}else if(market_data[data_ind[i],9]>=.97){.5}else{0}
-    smsStars[i] = smsStars[i]+if(market_data[data_ind[i],10]>=.98){.5}else{0}
+    ### Assign stars for sms
+    smsStars[i] = smsStars[i]+if(market_data$`sms_access_success_inter`[data_ind[i]]>=.99){1}else if(market_data$`sms_access_success_inter`[data_ind[i]]>=.97){.5}else{0}
+    smsStars[i] = smsStars[i]+if(market_data$`sms_access_success_intra`[data_ind[i]]>=.99){1}else if(market_data$`sms_access_success_intra`[data_ind[i]]>=.97){.5}else{0}
+    smsStars[i] = smsStars[i]+if(market_data$`sms_task_success_inter`[data_ind[i]]>=.99){1}else if(market_data$`sms_task_success_inter`[data_ind[i]]>=.97){.5}else{0}
+    smsStars[i] = smsStars[i]+if(market_data$`sms_task_success_intra`[data_ind[i]]>=.99){1}else if(market_data$`sms_task_success_intra`[data_ind[i]]>=.97){.5}else{0}
+    smsStars[i] = smsStars[i]+if(market_data$`ldrs_task_success`[data_ind[i]]>=.97){.5}else{0}
     
-    indTest<-which(test_data[data_ind,2]==carrier_id & test_data[data_ind,3]==26)
-    mean.ind<-mean(na.omit(market_data[indTest,6]))
-    
-    smsStars[i]<-smsStars[i]+if(mean.ind<=2000){.5}else{0}
+    #### come back to this......
+    indTest<-length(which(na.omit(tmp_testDat[which(tmp_testDat$test_type_id==26),]$ldrs_task_speed_max)<2000))/length(na.omit(tmp_testDat[which(tmp_testDat$test_type_id==26),]$ldrs_task_speed_max))
+    smsStars[i]<-smsStars[i]+if(indTest<=.98){.5}else{0}
     
     #mobile to landline call drop
     callStars[i]=callStars[i]+ifelse(market_data$co_drop[data_ind[i]]<=.01,2.5,ifelse(market_data$co_drop[data_ind[i]]<=.015,2,ifelse(market_data$co_drop[data_ind[i]]<=.02,1.5,ifelse(market_data$co_drop[data_ind[i]]<=.025,1,ifelse(market_data$co_drop[data_ind[i]]<=.03,.5,0)))))
